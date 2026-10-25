@@ -7,14 +7,8 @@
 <p align="center"><strong>Old Kindle, new tricks, alive 4ever.</strong></p>
 
 <p align="center">
-  <a href="https://github.com/ibrarwtf/kindle4ever/actions/workflows/ci.yml"><img src="https://github.com/ibrarwtf/kindle4ever/actions/workflows/ci.yml/badge.svg" alt="ci"></a>
-  <a href="https://github.com/ibrarwtf/kindle4ever/releases/latest"><img src="https://img.shields.io/github/v/release/ibrarwtf/kindle4ever?color=brightgreen" alt="release"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/ibrarwtf/kindle4ever?color=brightgreen" alt="license"></a>
-  <br>
-  <img src="https://img.shields.io/badge/launched-28%20Sep%202011-lightgrey" alt="launched 28 Sep 2011">
-  <img src="https://img.shields.io/date/1559174400?label=last%20firmware%20(4.1.4)&color=lightgrey" alt="last firmware 4.1.4, 30 May 2019">
-  <img src="https://img.shields.io/date/1779235200?label=Amazon%20support%20ended&color=lightgrey" alt="Amazon support ended 20 May 2026">
-  <img src="https://img.shields.io/github/last-commit/ibrarwtf/kindle4ever?label=our%20last%20update&color=brightgreen" alt="our last update">
+  <img src="https://img.shields.io/badge/Amazon-launched%2028%20Sep%202011%20%C2%B7%20last%20firmware%2030%20May%202019-lightgrey" alt="Amazon: launched 28 Sep 2011, last firmware 30 May 2019">
+  <a href="https://github.com/ibrarwtf/kindle4ever/releases/latest"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fibrarwtf%2Fkindle4ever%2Fmain%2Fdocs%2Fbadge.json" alt="kindle4ever version and last update"></a>
 </p>
 
 Amazon stopped supporting the Kindle 4 Non-Touch in May 2026. This repo turns one into a small Linux e-ink computer

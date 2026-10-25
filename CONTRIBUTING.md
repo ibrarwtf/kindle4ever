@@ -6,3 +6,4 @@
 - Never commit personal or device data: serials, MACs, IPs, Wi-Fi names, keys, backups, or screenshots of Settings > Device Info.
 - Tool options, output and exit codes are a contract (`docs/tools.md`). Change them only on purpose, and regenerate with `tools/gen-tools-doc.sh`.
 - Device reports are welcome as issues: paste `tools/doctor.sh --markdown`.
+- Releasing: add a `## vX.Y.Z` section to CHANGELOG.md, update `docs/badge.json` (version + date), then tag `vX.Y.Z`.
