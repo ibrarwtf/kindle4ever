@@ -1,0 +1,15 @@
+#!/bin/sh
+# Installed on rootfs by tools/install.sh. Keep this tiny and stable:
+# the real logic lives in /mnt/us/kindle4ever/boot.sh (editable over USB/SSH).
+# Kill switch: create /mnt/us/kindle4ever/DISABLE_BOOT (e.g. from Windows via the USB drive).
+# The script is copied to /var/run (tmpfs) and logs to /var/log: /mnt/us vanishes, and processes
+# using it get killed, whenever a PC mounts the drive over USB.
+case "$1" in
+  start)
+    if [ -f /mnt/us/kindle4ever/boot.sh ] && [ ! -f /mnt/us/kindle4ever/DISABLE_BOOT ]; then
+      cp /mnt/us/kindle4ever/boot.sh /var/run/k4-boot.sh
+      cd / && /bin/sh /var/run/k4-boot.sh >> /var/log/k4-boot.log 2>&1 &
+    fi
+    ;;
+esac
+exit 0

@@ -1,0 +1,17 @@
+#!/bin/sh
+# Simulated Kindle screen on your computer: same k4draw code, drawing into a file instead of the panel.
+#   tools/sim <k4draw args...>        e.g. tools/sim text 40 60 40 0 "Hello"  or  printf '...' | tools/sim -
+#   tools/sim show [out.png]         export what the Kindle panel would show (16 gray levels)
+#   tools/sim reset                  blank (white) screen
+# State lives in build/sim/screen.raw (or $K4DRAW_FB). Build first: tools/build.sh
+cd "$(dirname "$0")/.." || exit 1
+k=build/host/k4draw; [ -x "$k.exe" ] && k=$k.exe
+[ -x "$k" ] || { echo "no $k - run tools/build.sh" >&2; exit 1; }
+export K4DRAW_FB=${K4DRAW_FB:-build/sim/screen.raw}
+mkdir -p "$(dirname "$K4DRAW_FB")"
+case "$1" in
+  show) out=${2:-build/sim/screen.png}; "$k" export "$out" --panel && echo "$out" ;;
+  reset) rm -f "$K4DRAW_FB"; echo "blank screen" ;;
+  ""|-h|--help) sed -n '2,7p' "$0" ;;
+  *) exec "$k" "$@" ;;
+esac

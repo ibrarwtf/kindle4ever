@@ -1,0 +1,43 @@
+#!/bin/sh
+# Welcome screen: the logo, the devkit name, and the device's three dates as running counters.
+#   k4welcome [--hold]   draw it; --hold takes over the screen until a button is pressed
+case "$1" in -h|--help) awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"; exit 0 ;; esac
+export PATH=/mnt/us/kindle4ever/bin:/usr/sbin:/sbin:/usr/bin:/bin
+F=/usr/java/lib/fonts
+REG=$F/Helvetica_LT_65_Medium.ttf
+BOLD=$F/Helvetica_LT_75_Bold.ttf
+NAME=${K4_NAME:-kindle4ever}
+VERSION=$(cat /mnt/us/kindle4ever/VERSION 2>/dev/null || echo dev)
+
+now=$(date +%s)
+# days_since EPOCH -> "N days" / "N years"
+since() { awk -v n="$now" -v t="$1" 'BEGIN { d = int((n - t) / 86400); if (d >= 730) printf "%d years ago", d / 365.25; else printf "%d days ago", d }'; }
+LAUNCH=1317168000      # 2011-09-28: Kindle 4 announced and shipping
+LASTFW=1559174400      # 2019-05-30: firmware 4.1.4 built (the last one)
+EOS=1779235200         # 2026-05-20: Amazon ends support for 2012-and-older Kindles
+OURS=$(cat /mnt/us/kindle4ever/UPDATED 2>/dev/null || echo "$now")   # devkit's last update (written by install.sh)
+day() { awk -v t="$1" 'BEGIN { print strftime("%d %b %Y", t) }'; }   # busybox date can't format an epoch
+
+hold=0; [ "$1" = "--hold" ] && hold=1
+[ $hold = 1 ] && k4app on >/dev/null
+
+card() {  # card Y TITLE DATE AGO
+  echo "rect 60 $1 480 76 0 2"
+  echo "font $REG";  echo "text 80 $(($1 + 12)) 20 0 $2"
+  echo "font $BOLD"; echo "text 80 $(($1 + 38)) 26 0 $3"
+  echo "font $REG";  echo "text 360 $(($1 + 40)) 22 0 $4"
+}
+
+{
+  echo "clear"
+  k4logo 225 28 1
+  echo "font $BOLD"; echo "text 60 262 46 0 $NAME"
+  echo "font $REG";  echo "text 60 322 24 60 Old Kindle, new tricks, alive 4ever."
+  card 378 "Launched"                              "28 Sep 2011"     "$(since $LAUNCH)"
+  card 464 "Last firmware (4.1.4)"                 "30 May 2019"     "$(since $LASTFW)"
+  card 550 "Amazon support ended"                  "20 May 2026"     "$(since $EOS)"
+  card 636 "kindle4ever's last update ($VERSION)"   "$(day "$OURS")"  "$(since "$OURS" | sed 's/^0 days ago$/today/')"
+  echo "font $REG"; echo "text 60 744 20 90 ready$( [ $hold = 1 ] && echo '  ·  press any button')"
+} | k4draw -F -
+
+if [ $hold = 1 ]; then k4keys -1 >/dev/null; k4app off >/dev/null; fi

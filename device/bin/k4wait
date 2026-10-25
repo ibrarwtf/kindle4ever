@@ -1,0 +1,29 @@
+#!/bin/sh
+# Wait until the e-ink framebuffer stops changing.
+# usage: k4wait [-c] [stable_reads=3] [interval_ms=250] [timeout_ms=8000]
+#   -c  first wait (up to 2s) for the screen to change - use right after a key press,
+#       otherwise the old, still-stable screen ends the wait before the UI reacts.
+# Prints elapsed ms. Exit 0 = stable, 1 = timed out.
+case "$1" in -h|--help) awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"; exit 0 ;; esac
+change=0; [ "$1" = "-c" ] && { change=1; shift; }
+need=${1:-3} iv=${2:-250} to=${3:-8000}
+t=0
+last=$(md5sum < /dev/fb0)
+if [ $change = 1 ]; then
+  while [ $t -lt 2000 ]; do
+    usleep 100000; t=$((t+100))
+    cur=$(md5sum < /dev/fb0)
+    [ "$cur" != "$last" ] && { last=$cur; break; }
+  done
+fi
+same=0
+while [ $t -lt $to ]; do
+  usleep $((iv*1000)); t=$((t+iv))
+  cur=$(md5sum < /dev/fb0)
+  if [ "$cur" = "$last" ]; then
+    same=$((same+1)); [ $same -ge $need ] && { echo "${t}ms"; exit 0; }
+  else
+    same=0; last=$cur
+  fi
+done
+echo "timeout ${to}ms"; exit 1

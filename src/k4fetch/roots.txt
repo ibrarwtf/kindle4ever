@@ -1,0 +1,19 @@
+# Root CAs compiled into k4fetch: Mozilla bundle labels (https://curl.se/ca/cacert.pem).
+# Keep this small: only the CAs behind services our apps actually call.
+# After editing, run: tools/build.sh --update-roots
+ISRG Root X1
+ISRG Root X2
+GTS Root R1
+GTS Root R3
+GTS Root R4
+DigiCert Global Root G2
+DigiCert Global Root G3
+Sectigo Public Server Authentication Root E46
+Sectigo Public Server Authentication Root R46
+USERTrust ECC Certification Authority
+USERTrust RSA Certification Authority
+SSL.com Root Certification Authority ECC
+SSL.com TLS ECC Root CA 2022
+SSL.com TLS RSA Root CA 2022
+Amazon Root CA 1
+Amazon Root CA 3

@@ -1,0 +1,76 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Line endings (CRLF breaks scripts on the Kindle)
+        run: |
+          bad=$(git ls-files --eol | awk '$1 == "i/crlf" && $NF !~ /\.ps1$/ {print $NF}')
+          if [ -n "$bad" ]; then echo "CRLF in: $bad"; exit 1; fi
+
+      - name: ShellCheck (POSIX sh, warnings and errors)
+        run: |
+          shellcheck -s sh -S warning tools/*.sh tools/k4 tools/kcc tools/sim tools/lib/*.sh \
+            device/bin/* device/kindle4ever/boot.sh device/rootfs/etc/init.d/k4-boot device/jailbreak/runme.sh examples/*.sh
+
+      - name: Leak check (generic patterns)
+        run: tools/check-public.sh
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # whole history, not just the latest files
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # tags, for the version stamped into the binaries
+
+      - name: Toolchain (pinned Zig, sha256-checked)
+        run: tools/setup-toolchain.sh
+
+      - name: Build
+        run: tools/build.sh
+
+      - name: Run the ARM binaries under qemu
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq qemu-user fonts-dejavu-core
+          for t in k4draw k4keys k4fetch; do qemu-arm build/$t --version; done
+          # draw with the real ARM k4draw into a simulated screen, and check the pixels
+          export K4DRAW_FB=/tmp/screen.raw
+          printf 'clear\nfill 0 0 100 100 0\ntext 20 200 40 0 CI\n' | qemu-arm build/k4draw -
+          qemu-arm build/k4draw export /tmp/screen.png
+          test "$(head -c 1 /tmp/screen.raw | od -An -tu1 | tr -d ' ')" = 255   # black = 255 in K4 memory
+          # a real HTTPS fetch through k4fetch's own TLS
+          qemu-arm build/k4fetch -o /tmp/page.html -t 20 https://example.com && grep -qi '<html' /tmp/page.html
+          # a bad certificate must fail with exit 4
+          set +e; qemu-arm build/k4fetch -o /dev/null -t 20 https://expired.badssl.com; rc=$?; set -e
+          test "$rc" = 4
+
+      - name: docs/tools.md matches the tools' --help
+        run: tools/gen-tools-doc.sh --check
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: kindle4ever-${{ github.sha }}
+          path: |
+            build/k4draw
+            build/k4keys
+            build/k4fetch
+            build/host/k4draw
+            /tmp/screen.png

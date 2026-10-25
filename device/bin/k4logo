@@ -1,0 +1,50 @@
+#!/bin/sh
+# Print k4draw commands for the devkit logo: a Kindle 4 drawn from rectangles.
+#   k4logo [X] [Y] [SCALE] [name]   top-left corner (default 0 0), size (1 = 150x210 px);
+#                                   "name" adds the kindle4ever wordmark under the device (+34 px)
+# Optional: K4LOGO_BODY (body gray, default 0 = black), K4LOGO_SIDE ("INSET WIDTH GRAY MODE" page-turn buttons, "" = none)
+#   e.g.  k4logo 225 80 1 | k4draw -
+case "$1" in -h|--help) awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"; exit 0 ;; esac
+# bold font for the wordmark: the Kindle's Helvetica Bold, else a common system bold (simulator)
+BOLD=
+for f in /usr/java/lib/fonts/Helvetica_LT_75_Bold.ttf C:/Windows/Fonts/arialbd.ttf          /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf /System/Library/Fonts/Supplemental/Arial\ Bold.ttf; do
+  [ -f "$f" ] && { BOLD=$f; break; }
+done
+awk -v BOLD="$BOLD" -v X="${1:-0}" -v Y="${2:-0}" -v S="${3:-1}" -v NAME="${4:-}" -v BODY="${K4LOGO_BODY:-0}" -v SIDE="${K4LOGO_SIDE-0 5 150 split}" '
+function p(v) { return int(v * S + 0.5) }
+function fill(x, y, w, h, g) { printf "fill %d %d %d %d %d\n", X + p(x), Y + p(y), p(w), p(h), g }
+function rect(x, y, w, h, g, t) { printf "rect %d %d %d %d %d %d\n", X + p(x), Y + p(y), p(w), p(h), g, (p(t) < 1 ? 1 : p(t)) }
+BEGIN {
+  BTN = BODY < 128 ? 225 : 0                  # buttons: light on a dark body, black on a light one
+  fill(0, 0, 150, 210, BODY)                  # body: black like the real K4 (K4LOGO_BODY=255 for a white one)
+  rect(0, 0, 150, 210, 0, 5)                  # body frame
+  # page-turn buttons as thin lines inside the body: K4LOGO_SIDE="INSET WIDTH GRAY MODE"
+  # (base units; MODE split = short "previous" + long "next", single = one line, ticks = two short marks)
+  if (SIDE != "") {
+    split(SIDE, sd, " "); in_ = sd[1]; w_ = sd[2]; g_ = sd[3]; m_ = sd[4]
+    for (side = 0; side < 2; side++) {
+      sx = side ? 150 - in_ - w_ : in_
+      if (m_ == "single") fill(sx, 60, w_, 82, g_)
+      else if (m_ == "ticks") { fill(sx, 64, w_, 12, g_); fill(sx, 92, w_, 30, g_) }
+      else { fill(sx, 58, w_, 22, g_); fill(sx, 84, w_, 58, g_) }
+    }
+  }
+  fill(18, 18, 114, 140, 0)                   # bezel
+  fill(26, 26, 98, 124, 225)                  # screen: light "paper" gray
+  # terminal window on the screen: white, black frame, gray title bar with three dots, ">_" prompt
+  fill(42, 63, 66, 50, 255)
+  rect(42, 63, 66, 50, 0, 3)
+  fill(45, 66, 60, 10, 160)                   # title bar
+  fill(49, 69, 4, 4, 0); fill(55, 69, 4, 4, 0); fill(61, 69, 4, 4, 0)   # the three dots
+  fill(51, 85, 5, 5, 0); fill(54, 88, 5, 5, 0); fill(57, 91, 5, 5, 0)   # ">" in pixel steps
+  fill(54, 94, 5, 5, 0); fill(51, 97, 5, 5, 0)
+  fill(65, 97, 16, 5, 0)                      # "_" cursor
+  fill(26, 176, 10, 10, BTN); fill(42, 176, 10, 10, BTN)    # back, keyboard
+  # 5-way pad: a square, with its centre button centred in pixels after scaling
+  dx = X + p(63); dy = Y + p(169); ds = p(24); dot = p(5) < 2 ? 2 : p(5)
+  printf "rect %d %d %d %d %d %d\n", dx, dy, ds, ds, BTN, (p(3) < 1 ? 1 : p(3))
+  printf "fill %d %d %d %d %d\n", dx + int((ds - dot) / 2), dy + int((ds - dot) / 2), dot, dot, BTN
+  fill(98, 176, 10, 10, BTN); fill(114, 176, 10, 10, BTN)   # menu, home
+  if (NAME != "" && BOLD != "") printf "font %s\n", BOLD
+  if (NAME != "") printf "ctext %d %d %d 0 kindle4ever\n", X + p(75), Y + p(218), p(22)   # wordmark
+}'

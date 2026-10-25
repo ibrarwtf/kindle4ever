@@ -1,0 +1,31 @@
+#!/bin/sh
+# Hand the screen to our own code, or give it back to Amazon's UI (the Java "framework").
+#   k4app on      stop the framework (screen + keys are ours), clear the screen
+#   k4app off     restart the framework (normal Kindle UI back)
+#   k4app status
+# Safety: rebooting always brings the framework back (nothing here is persistent).
+case "$1" in -h|--help) awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"; exit 0 ;; esac
+export PATH=/mnt/us/kindle4ever/bin:/usr/sbin:/sbin:/usr/bin:/bin
+# One k4app at a time: overlapping "on" and "off" calls would race the framework's stop/start.
+LOCK=/var/run/k4app.lock
+i=0
+until mkdir "$LOCK" 2>/dev/null; do
+  i=$((i + 1)); [ $i -gt 120 ] && { echo "k4app: busy (stale $LOCK? remove it)" >&2; exit 1; }
+  sleep 1
+done
+trap 'rmdir "$LOCK"' EXIT
+case "$1" in
+  on)
+    /etc/init.d/framework stop
+    k4draw clear
+    echo "framework stopped"
+    ;;
+  off)
+    /etc/init.d/framework start
+    echo "framework starting (UI back in ~30-60s)"
+    ;;
+  status)
+    if ps | grep -q "[c]vm"; then echo "framework running"; else echo "framework stopped (app mode)"; fi
+    ;;
+  *) echo "usage: k4app on|off|status" >&2; exit 2 ;;
+esac

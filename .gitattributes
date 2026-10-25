@@ -1,0 +1,6 @@
+# LF everywhere: shell scripts with CRLF break on the Kindle (busybox sh), and its sed can't strip \r.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.jpg binary
+*.tar.gz binary

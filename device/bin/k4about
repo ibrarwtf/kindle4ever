@@ -1,0 +1,76 @@
+#!/bin/sh
+# neofetch-style "about this Kindle" card: model, firmware, kernel, memory, storage, battery, kindle4ever version
+#   k4about          take over the screen, show the card, return to Amazon's UI on any button press
+#   k4about --draw   just draw it (no app mode, no waiting), e.g. for screenshots
+# Nothing personal is shown (no serial, MAC, IP or Wi-Fi name), so it's safe to photograph.
+case "$1" in -h|--help) awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"; exit 0 ;; esac
+export PATH=/mnt/us/kindle4ever/bin:/usr/sbin:/sbin:/usr/bin:/bin
+F=/usr/java/lib/fonts
+REG=$F/Helvetica_LT_65_Medium.ttf
+BOLD=$F/Helvetica_LT_75_Bold.ttf
+
+case "$(cut -c1-4 /proc/usid)" in
+  9023) model="Kindle 4 NT (black, 2012)" ;;
+  B00E) model="Kindle 4 NT (silver, 2011)" ;;
+  *) model="Kindle ($(cut -c1-4 /proc/usid))" ;;
+esac
+fw=$(sed 's/ (.*//' /etc/prettyversion.txt)
+kernel=$(uname -r)
+cpu="i.MX50 ARMv7 800 MHz"
+mem=$(awk '/^MemTotal/ {t=$2} /^MemFree/ {f=$2} /^Buffers/ {b=$2} /^Cached/ {c=$2}
+           END {printf "%d / %d MB", (t-f-b-c)/1024, t/1024}' /proc/meminfo)
+disk=$(df -k /mnt/us | awk 'NR==2 {printf "%.1f GB free of %.1f GB", $4/1048576, $2/1048576}')
+batt=$(gasgauge-info -c 2>/dev/null)
+[ "$(lipc-get-prop com.lab126.powerd isCharging 2>/dev/null)" = 1 ] && batt="$batt, charging"
+wifi=$(lipc-get-prop com.lab126.wifid cmState 2>/dev/null | tr 'A-Z' 'a-z')
+up=$(awk '{s=int($1); d=int(s/86400); h=int(s%86400/3600); m=int(s%3600/60);
+           if (d) printf "%dd %dh %dm", d, h, m; else if (h) printf "%dh %dm", h, m; else printf "%dm", m}' /proc/uptime)
+devkit=$(cat /mnt/us/kindle4ever/VERSION 2>/dev/null || echo "not installed")
+shell=$(busybox 2>&1 | head -1 | cut -d' ' -f1-2)
+now=$(date '+%H:%M UTC  %a %d %b %Y')
+
+draw() {
+  k4logo 40 40 1   # the devkit logo, neofetch-style
+  # Title.
+  echo "font $BOLD"
+  echo "text 220 52 40 0 root@kindle"
+  echo "fill 220 104 340 3 0"
+  echo "font $REG"
+  echo "text 220 122 24 60 rooted, running our own code"
+  echo "text 220 158 24 60 $now"
+  [ "$HINT" ] && echo "text 220 200 20 90 press any button to return"
+  # Info rows.
+  y=286
+  row() {
+    echo "font $BOLD"; echo "text 40 $y 26 0 $1"
+    echo "font $REG";  echo "text 200 $y 26 0 $2"
+    y=$((y + 40))
+  }
+  row "Model"    "$model"
+  row "Firmware" "$fw"
+  row "Kernel"   "$kernel"
+  row "CPU"      "$cpu"
+  row "Memory"   "$mem"
+  row "Storage"  "$disk"
+  row "Battery"  "$batt"
+  row "Wi-Fi"    "$wifi"
+  row "Uptime"   "$up"
+  row "Shell"    "$shell"
+  row "Running"  "kindle4ever $devkit"
+  # The panel's 16 gray levels, like neofetch's color blocks.
+  i=0
+  while [ $i -lt 16 ]; do
+    echo "fill $((40 + i * 33)) 734 33 40 $((i * 17))"
+    i=$((i + 1))
+  done
+  echo "rect 40 734 528 40 0 1"
+}
+
+if [ "$1" = "--draw" ]; then
+  { echo "clear"; draw; } | k4draw -F -
+  exit 0
+fi
+k4app on >/dev/null
+HINT=1 draw | k4draw -
+k4keys -1 >/dev/null
+k4app off >/dev/null

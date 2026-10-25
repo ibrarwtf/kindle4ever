@@ -1,0 +1,8 @@
+#!/bin/sh
+# Cross-compile C for the Kindle 4 NT (i.MX50, Cortex-A8) as a fully static musl binary.
+# usage: tools/kcc -o build/foo src/foo/foo.c [more cc args]
+# Static, so nothing depends on the device's glibc 2.12.1. The kernel is 2.6.31: avoid newer syscalls.
+# Zig: $K4_ZIG, else toolchain/zig (tools/setup-toolchain.sh), else zig on PATH.
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+. "$ROOT/tools/lib/zig.sh"
+exec "$ZIG" cc -target arm-linux-musleabi -mcpu=cortex_a8 -static -Os -s "$@"

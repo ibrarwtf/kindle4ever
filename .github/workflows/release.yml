@@ -1,0 +1,57 @@
+name: release
+
+# Push a tag vX.Y.Z (matching a "## vX.Y.Z" section in CHANGELOG.md) to publish a release:
+#   kindle4ever-X.Y.Z.tar.gz  the repo + prebuilt device binaries, ready for tools/install.sh
+#   SHA256SUMS                     checksums, plus a GitHub build-provenance attestation
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Leak check
+        run: tools/check-public.sh
+
+      - name: Build
+        run: |
+          tools/setup-toolchain.sh
+          tools/build.sh
+          test "$(build/host/k4draw --version)" = "k4draw $GITHUB_REF_NAME"   # binaries carry the tag
+
+      - name: Package
+        run: |
+          v=${GITHUB_REF_NAME#v}
+          name=kindle4ever-$v
+          mkdir -p "dist/$name"
+          git archive HEAD | tar -x -C "dist/$name"
+          mkdir -p "dist/$name/build"
+          cp build/k4draw build/k4keys build/k4fetch build/hello "dist/$name/build/"
+          printf '%s\n' "$GITHUB_REF_NAME" > "dist/$name/VERSION"   # tarballs have no git: tools read this
+          tar -czf "dist/$name.tar.gz" -C dist "$name"
+          (cd dist && sha256sum "$name.tar.gz" > SHA256SUMS)
+          # release notes = this version's CHANGELOG section
+          awk -v h="## $GITHUB_REF_NAME" '$0 == h {f=1; next} /^## / && f {exit} f' CHANGELOG.md > dist/notes.md
+          test -s dist/notes.md || { echo "no '## $GITHUB_REF_NAME' section in CHANGELOG.md"; exit 1; }
+
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: dist/*.tar.gz
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.tar.gz dist/SHA256SUMS \
+            --title "$GITHUB_REF_NAME" --notes-file dist/notes.md

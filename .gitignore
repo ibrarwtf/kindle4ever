@@ -1,0 +1,9 @@
+# build outputs and downloads
+build/
+toolchain/
+vendor/
+shots/
+# local settings and secrets
+k4.env
+.known_hosts
+*.img

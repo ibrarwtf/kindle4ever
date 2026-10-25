@@ -1,0 +1,101 @@
+#!/bin/sh
+# On-device half of tools/doctor.sh: runs every check in one go and prints
+#   STATUS|check|detail        (STATUS = PASS, WARN, FAIL or INFO)
+# Nothing personal is printed: no serial, MAC, IP or Wi-Fi name.
+# usage: k4doctor [host-version]
+export PATH=/mnt/us/kindle4ever/bin:/usr/sbin:/sbin:/usr/bin:/bin:/mnt/us/usbnet/bin
+D=/mnt/us/kindle4ever
+HOSTVER=${1:-}
+r() { echo "$1|$2|$3"; }
+
+# 1. system
+prefix=$(cut -c1-4 /proc/usid 2>/dev/null)
+case "$prefix" in
+  B00E) model="K4 silver (2011)" ;; 9023) model="K4 black (2012)" ;; *) model="unknown" ;;
+esac
+[ "$model" = unknown ] && r WARN model "serial prefix $prefix: not a known K4 NT" || r PASS model "$prefix = $model"
+fw=$(head -1 /etc/prettyversion.txt 2>/dev/null)
+case "$fw" in "Kindle 4."*) r PASS firmware "$fw" ;; *) r WARN firmware "${fw:-unknown}" ;; esac
+r INFO kernel "$(uname -r)"
+r INFO uptime "$(cut -d. -f1 /proc/uptime)s"
+
+# 2. devkit
+dver=$(cat $D/VERSION 2>/dev/null)
+if [ -z "$dver" ]; then r FAIL kindle4ever "not installed ($D/VERSION missing): run tools/install.sh"
+elif [ -n "$HOSTVER" ] && [ "$dver" != "$HOSTVER" ]; then r WARN kindle4ever "device $dver, host $HOSTVER: run tools/install.sh"
+else r PASS kindle4ever "$dver"; fi
+missing=""; broken=""
+for b in k4draw k4keys k4fetch; do
+  [ -x $D/bin/$b ] || { missing="$missing $b"; continue; }
+  $D/bin/$b --version >/dev/null 2>&1 || broken="$broken $b"
+done
+for s in k4press k4wait k4app; do [ -x $D/bin/$s ] || missing="$missing $s"; done
+if [ -n "$missing$broken" ]; then r FAIL binaries "missing:${missing:- none} broken:${broken:- none}"
+else r PASS binaries "k4draw k4keys k4fetch k4press k4wait k4app"; fi
+
+# 3. boot hook, boot.sh, clock
+if [ -x /etc/init.d/k4-boot ] && [ -L /etc/rc5.d/S97k4-boot ]; then r PASS boot-hook "/etc/init.d/k4-boot + rc5 link"
+else r WARN boot-hook "not installed (boot.sh won't run at boot)"; fi
+[ -f $D/DISABLE_BOOT ] && r WARN boot-hook "disabled by $D/DISABLE_BOOT"
+pid=$(cat /var/run/k4-boot.pid 2>/dev/null)
+if [ -n "$pid" ] && [ -d /proc/$pid ]; then r PASS boot.sh "running (pid $pid)"
+else r WARN boot.sh "not running (no auto-sleep prevention, no clock sync)"; fi
+last=$(tail -1 /var/log/k4-boot.log 2>/dev/null)
+[ -n "$last" ] && r INFO boot-log "$last"
+year=$(date +%Y)
+[ "$year" -ge 2025 ] 2>/dev/null && r PASS clock "$(date -u '+%Y-%m-%d %H:%M UTC')" || r FAIL clock "$(date -u) (HTTPS certificate checks will fail)"
+
+# 4. display: framebuffer facts + a memory-only draw test (no panel refresh, original bytes restored)
+fbid=$(cat /sys/class/graphics/fb0/name 2>/dev/null)
+geom="$(cat /sys/class/graphics/fb0/virtual_size 2>/dev/null) stride $(cat /sys/class/graphics/fb0/stride 2>/dev/null)"
+if [ "$fbid" = eink_fb ] && [ "$geom" = "600,800 stride 600" ]; then r PASS framebuffer "eink_fb 600x800 stride 600"
+else r FAIL framebuffer "id '$fbid', $geom (expected eink_fb 600,800 stride 600)"; fi
+T=/tmp/k4doctor.$$
+# 10 bottom rows (790-799)
+dd if=/dev/fb0 of=$T.save bs=600 skip=790 count=10 2>/dev/null
+dd if=/dev/zero bs=6000 count=1 2>/dev/null | tr '\000' '\377' > $T.black
+if k4draw -n fill 0 790 600 10 0 >/dev/null 2>&1; then
+  dd if=/dev/fb0 bs=600 skip=790 count=10 2>/dev/null > $T.got
+  # restore
+  dd if=$T.save of=/dev/fb0 bs=600 seek=790 count=10 2>/dev/null  # busybox 1.7.2 dd has no conv=
+  if [ "$(md5sum < $T.got)" = "$(md5sum < $T.black)" ]; then r PASS draw "k4draw wrote black as 0xff (inverted palette), restored"
+  else r FAIL draw "framebuffer bytes didn't match after k4draw fill"; fi
+  dd if=/dev/fb0 bs=600 skip=790 count=10 2>/dev/null | md5sum > $T.after
+  [ "$(cat $T.after)" = "$(md5sum < $T.save)" ] || r WARN draw "could not restore the original bytes (screen may show a stripe after the next refresh)"
+else
+  r FAIL draw "k4draw failed"
+fi
+rm -f $T.save $T.black $T.got $T.after
+
+# 5. input: device names + an injected key read back by k4keys (unused 'volume' device, so the UI doesn't react)
+names=$(grep '^N: Name=' /proc/bus/input/devices 2>/dev/null | cut -d'"' -f2 | tr '\n' ' ')
+case "$names" in *tequila-keypad*fiveway*) r PASS input-devices "$names" ;; *) r FAIL input-devices "found: ${names:-none}" ;; esac
+k4keys -t 4 > $T.keys 2>&1 &
+kk=$!
+sleep 1
+k4press 2:114 >/dev/null 2>&1
+wait $kk 2>/dev/null
+if grep -q '2:114' $T.keys; then r PASS key-loop "k4press -> evdev -> k4keys round trip"
+else r FAIL key-loop "injected key not seen by k4keys: $(head -1 $T.keys)"; fi
+rm -f $T.keys
+
+# 6. network
+cm=$(lipc-get-prop com.lab126.wifid cmState 2>/dev/null)
+[ "$cm" = CONNECTED ] && r PASS wifi "connected" || r WARN wifi "state ${cm:-unknown}"
+if k4fetch -o /dev/null -t 10 https://example.com >/dev/null 2>&1; then r PASS https "k4fetch https://example.com"
+else r FAIL https "k4fetch https://example.com failed (exit $?)"; fi
+grep -q '^# >>> kindle4ever amazon-block' /etc/hosts && r INFO amazon-block on || r INFO amazon-block off
+
+# 7. power
+batt=$(cat /sys/devices/system/yoshi_battery/yoshi_battery0/battery_capacity 2>/dev/null)
+r INFO battery "${batt:-unknown}, charging $(lipc-get-prop com.lab126.powerd isCharging 2>/dev/null)"
+r INFO powerd "state $(lipc-get-prop com.lab126.powerd state 2>/dev/null)"
+pss=$(lipc-get-prop com.lab126.powerd preventScreenSaver 2>/dev/null)
+[ "$pss" = 0 ] && r PASS power-button "preventScreenSaver 0" || r WARN power-button "preventScreenSaver=$pss: powerd ignores the power button"
+
+# 8. space
+free_mb() { df -k "$1" 2>/dev/null | awk 'NR==2 {print int($4/1024)}'; }
+us=$(free_mb /mnt/us); var=$(free_mb /var); vl=$(free_mb /var/local)
+r INFO space "/mnt/us ${us}MB free"
+[ "${var:-0}" -ge 8 ] && r PASS space-var "/var ${var}MB free" || r WARN space-var "/var only ${var}MB free (32 MB tmpfs)"
+[ "${vl:-0}" -ge 5 ] && r PASS space-varlocal "/var/local ${vl}MB free" || r WARN space-varlocal "/var/local only ${vl}MB free"

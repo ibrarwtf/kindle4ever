@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# $Id: config 9680 2013-08-09 20:13:06Z NiLuJe $
+#
+
+# WARNING: Take note that we're essentially a shell script, se we absolutely *MUST* use UNIX line endings!
+# WARNING: To avoid leaving your system in an undefined state,
+#          do *NOT* modify this file while usb over ethernet is enabled!
+#          (That means when the the auto enable feature is in use, too!)
+
+# Tweak these to match your setup (IPv4 only, no hostname aliases)
+# NOTE: The K4 has a specific default
+HOST_IP=192.168.15.201
+KINDLE_IP=192.168.15.244
+
+# Allow SSH over WiFi
+# NOTE: If you set this to true, the SSHD *WILL* check your passwords!
+# Make sure you know your root password, or auth via shared keys!
+# Leave it to false on non-WiFi devices
+K3_WIFI="true"
+
+# Don't switch to Ethernet over USB, and only launch SSHD
+# NOTE: Make sure you're able to properly login over SSH before enabling this...
+# It's obviously only useful with WiFi devices, so leave to false on non-WiFi devices
+K3_WIFI_SSHD_ONLY="true"
+
+# Use OpenSSH instead of dropbear (somewhat faster login)
+# NOTE: OpenSSH *WILL* check your passwords!
+# Make sure you know your root password, or auth via shared keys!
+USE_OPENSSH="false"
+
+# Let volumd handle the low-level stuff (module switching)
+# Might help if you get stuck with the "USB Drive Mode" screen even while in usbnet mode,
+# especially on some devices... (K4, I'm looking at you!)
+USE_VOLUMD="true"
+
+# Don't let dropbear print the banner at each login
+QUIET_DROPBEAR="false"
+
+# Use a custom NIC field for the MAC adresses.
+# Will mostly be of use to people needing to plug multiple Kindles on the same computer/network.
+TWEAK_MAC_ADDRESS="false"

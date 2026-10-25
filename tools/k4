@@ -1,0 +1,57 @@
+#!/bin/sh
+# k4: drive the Kindle over SSH from your computer.
+#   k4 sh <cmd...>               run a shell command on the Kindle (kindle4ever tools on PATH)
+#   k4 shot [file.png]           wait for the screen to settle, then screenshot (default shots/<timestamp>.png)
+#   k4 press <key> [key...]      press keys in one SSH session, waiting for the screen after each
+#   k4 push <local> <remote>     copy a text file (CRs stripped on the host)
+#   k4 pushbin <local> <remote>  copy a binary file as-is
+#   k4 run <script> [args]       copy a script to the Kindle and run it
+#   k4 deploy                    copy device/bin + build/ binaries to the Kindle (install.sh does the full setup)
+#   k4 doctor [--markdown]       self-test (tools/doctor.sh)
+#   k4 sim <k4draw args>         simulated screen on this computer (tools/sim)
+#   k4 version                   kindle4ever version on this computer and on the Kindle
+# Settings: K4_HOST, K4_SSH_KEY, ... (env vars or k4.env, see k4.env.example).
+# Note: never strip CRs with sed on the Kindle - busybox sed reads "\r" as a literal "r".
+. "$(dirname "$0")/lib/env.sh"
+. "$(dirname "$0")/lib/version.sh"
+cd "$K4_ROOT" || exit 1
+D=$K4_DEVICE_DIR
+
+# Drop the dropbear login banner from stderr, keep real errors and the remote exit code.
+RCF=$(mktemp)
+quiet() {
+  { { "$@" 2>&1 1>&3; echo $? > "$RCF"; } | tr -d '\r' | grep -v -e '^Welcome to Kindle!' -e '^$' >&2; } 3>&1
+  rc=$(cat "$RCF"); rm -f "$RCF"; return "$rc"
+}
+
+# Warn (at most every 10 min) when the Kindle runs a different devkit version than this checkout.
+version_check() {
+  stamp=build/.device-version-checked
+  [ -f "$stamp" ] && [ -n "$(find "$stamp" -mmin -10 2>/dev/null)" ] && return
+  mkdir -p build; : > "$stamp"
+  host=$(k4_version)
+  dev=$(k4_ssh "cat $D/VERSION 2>/dev/null" 2>/dev/null | tr -d '\r\n')
+  [ -n "$dev" ] && [ "$dev" != "$host" ] && echo "k4: device has kindle4ever $dev, this checkout is $host (tools/install.sh to update)" >&2
+}
+
+cmd=$1; [ $# -gt 0 ] && shift
+case "$cmd" in sh|press|run|shot) version_check ;; esac
+case "$cmd" in
+  sh) quiet k4_ssh "$K4_REMOTE_ENV $*" ;;
+  shot) out=${1:-shots/$(date +%Y-%m-%d_%H%M%S).png}; mkdir -p "$(dirname "$out")"
+        k4_ssh "$K4_REMOTE_ENV k4wait >/dev/null; fbgrab /tmp/s.png >/dev/null 2>&1; cat /tmp/s.png; rm -f /tmp/s.png" 2>/dev/null > "$out" && echo "$out" ;;
+  press) script=""; for key in "$@"; do script="$script k4press $key && k4wait -c >/dev/null;"; done
+         quiet k4_ssh "$K4_REMOTE_ENV $script" ;;
+  push) tr -d '\r' < "$1" | quiet k4_ssh "mkdir -p \"\$(dirname '$2')\" && cat > '$2'" ;;
+  pushbin) quiet k4_ssh "mkdir -p \"\$(dirname '$2')\" && cat > '$2'" < "$1" ;;
+  run) f=$1; shift; r=$D/run/$(basename "$f")
+       tr -d '\r' < "$f" | quiet k4_ssh "mkdir -p $D/run && cat > $r && chmod +x $r" && quiet k4_ssh "$K4_REMOTE_ENV $r $*" ;;
+  deploy) for f in device/bin/*; do sh "$0" push "$f" "$D/bin/$(basename "$f")"; done
+          for f in build/*; do [ -f "$f" ] && sh "$0" pushbin "$f" "$D/bin/$(basename "$f")"; done
+          quiet k4_ssh "chmod +x $D/bin/*; ls $D/bin" ;;
+  doctor) exec tools/doctor.sh "$@" ;;
+  sim) exec tools/sim "$@" ;;
+  version) echo "host:   $(k4_version)"
+           printf 'device: '; quiet k4_ssh "cat $D/VERSION 2>/dev/null || echo 'not installed'" ;;
+  *) sed -n '2,14p' "$0"; exit 2 ;;
+esac

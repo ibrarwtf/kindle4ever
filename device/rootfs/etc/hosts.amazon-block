@@ -1,0 +1,16 @@
+# >>> kindle4ever amazon-block
+# Block Amazon's Kindle services (the K4 is past end-of-support; firmware 4.1.4 is final).
+# Points them at localhost so connections fail fast instead of timing out.
+# Covers OTA/sync ("todo"), store, registration, device events, messaging, and time (NTP/HTTP Date);
+# the devkit's boot.sh syncs the clock from pool.ntp.org instead.
+# Not listed on purpose: wifid's anonymous connectivity probe (spectrum.s3.amazonaws.com,
+# dogvgb9ujhybx.cloudfront.net, dns.kindle.com). wifid resolves those with its own DNS query,
+# bypassing this file, and breaking the probe could make Wi-Fi drop.
+# Managed by tools/install.sh --amazon-block / tools/uninstall.sh (everything between the markers).
+127.0.0.1 amazon.com www.amazon.com w.amazon.com kindle.amazon.com
+127.0.0.1 todo-g7g.amazon.com cde-g7g.amazon.com det-g7g.amazon.com det-ta-g7g.amazon.com
+127.0.0.1 firs-g7g.amazon.com firs-ta-g7g.amazon.com fras-g7g.amazon.com fints-g7g.amazon.com
+127.0.0.1 website-g7g.amazon.com kindle-g7g.amazon.com ntp-g7g.amazon.com kindle-time.amazon.com
+127.0.0.1 kdk-ws.amazon.com device-messaging-na.amazon.com kindleatt1.amazon.com kindlevoda1.amazon.co.uk
+127.0.0.1 www.amazon.de www.amazon.co.uk www.amazon.in
+# <<< kindle4ever amazon-block

@@ -1,0 +1,21 @@
+#!/bin/sh
+# Inject a key press into a Kindle input device by writing raw input_event structs.
+# usage: k4press <key> [hold_ms]   key = name (see below) or <dev>:<code>
+# 32-bit ARM input_event: timeval(8) + type(u16) + code(u16) + value(s32), little-endian.
+case "$1" in -h|--help) awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"; exit 0 ;; esac
+case "$1" in
+  home) D=0 C=102 ;; menu) D=0 C=139 ;; back) D=0 C=158 ;;
+  # page keys, by side (verified by physical press order 2026-10-25)
+  lnext|next) D=0 C=104 ;; lprev|prev) D=0 C=193 ;; rnext|next2) D=0 C=191 ;; rprev|prev2) D=0 C=109 ;; kbd) D=0 C=29 ;;
+  power) exec powerd_test -p ;;
+  up) D=1 C=103 ;; down) D=1 C=108 ;; left) D=1 C=105 ;; right) D=1 C=106 ;; select|ok) D=1 C=194 ;;
+  *:*) D=${1%%:*} C=${1##*:} ;;
+  *) echo "usage: k4press home|menu|back|lnext|lprev|rnext|rprev|kbd|power|up|down|left|right|select|<dev>:<code> [hold_ms]" >&2; exit 2 ;;
+esac
+o() { printf '\%03o' "$1"; }
+ev() { # type code value
+  printf "\000\000\000\000\000\000\000\000$(o $(($1&255)))$(o $(($1>>8)))$(o $(($2&255)))$(o $(($2>>8)))$(o $3)\000\000\000"
+}
+{ ev 1 $C 1; ev 0 0 0; } > /dev/input/event$D
+usleep $(( ${2:-80} * 1000 ))
+{ ev 1 $C 0; ev 0 0 0; } > /dev/input/event$D
