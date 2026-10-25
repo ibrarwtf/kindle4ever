@@ -1,0 +1,53 @@
+name: badges
+
+# Keeps the two README badges' relative dates current ("7 years ago", "updated today").
+# Writes shields.io endpoint JSON to the orphan branch `badges`, so main gets no daily commits.
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * *'   # daily
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  badges:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Write badge JSON
+        run: |
+          now=$(date +%s)
+          ago() {  # ago EPOCH -> "today" / "yesterday" / "N days ago" / "N months ago" / "N years ago"
+            d=$(( (now - $1) / 86400 ))
+            if   [ $d -lt 1 ];   then echo "today"
+            elif [ $d -lt 2 ];   then echo "yesterday"
+            elif [ $d -lt 60 ];  then echo "$d days ago"
+            elif [ $d -lt 730 ]; then echo "$(( d / 30 )) months ago"
+            else                      echo "$(( d * 100 / 36525 )) years ago"; fi
+          }
+          launched=1317168000   # 2011-09-28: Kindle 4 announced and shipping
+          lastfw=1559174400     # 2019-05-30: firmware 4.1.4 built, the last one
+          version=$(sed -n 's/^## \(v[0-9][^ ]*\).*/\1/p' CHANGELOG.md | head -1)
+          updated=$(git log -1 --format=%ct origin/main)
+          mkdir -p out
+          printf '{"schemaVersion": 1, "label": "Amazon", "message": "launched %s · last firmware %s", "color": "lightgrey"}\n' \
+            "$(ago $launched)" "$(ago $lastfw)" > out/amazon.json
+          printf '{"schemaVersion": 1, "label": "kindle4ever", "message": "%s · updated %s", "color": "brightgreen"}\n' \
+            "$version" "$(ago "$updated")" > out/kindle4ever.json
+          cat out/*.json
+
+      - name: Publish to the badges branch
+        run: |
+          cd out
+          git init -q -b badges
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -q -m "badges $(date -u +%F)"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" badges

@@ -29,7 +29,6 @@ jobs:
           tools/setup-toolchain.sh
           tools/build.sh
           test "$(build/host/k4draw --version)" = "k4draw $GITHUB_REF_NAME"   # binaries carry the tag
-          grep -q "\"$GITHUB_REF_NAME " docs/badge.json || { echo "docs/badge.json doesn't say $GITHUB_REF_NAME"; exit 1; }
 
       - name: Package
         run: |

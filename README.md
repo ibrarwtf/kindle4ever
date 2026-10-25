@@ -7,8 +7,8 @@
 <p align="center"><strong>Old Kindle, new tricks, alive 4ever.</strong></p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Amazon-launched%2028%20Sep%202011%20%C2%B7%20last%20firmware%2030%20May%202019-lightgrey" alt="Amazon: launched 28 Sep 2011, last firmware 30 May 2019">
-  <a href="https://github.com/ibrarwtf/kindle4ever/releases/latest"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fibrarwtf%2Fkindle4ever%2Fmain%2Fdocs%2Fbadge.json" alt="kindle4ever version and last update"></a>
+  <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fibrarwtf%2Fkindle4ever%2Fbadges%2Famazon.json" alt="Amazon: when the Kindle 4 launched and got its last firmware">
+  <a href="https://github.com/ibrarwtf/kindle4ever/releases/latest"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fibrarwtf%2Fkindle4ever%2Fbadges%2Fkindle4ever.json" alt="kindle4ever version and last update"></a>
 </p>
 
 Amazon stopped supporting the Kindle 4 Non-Touch in May 2026. This repo turns one into a small Linux e-ink computer
