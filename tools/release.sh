@@ -13,6 +13,13 @@ if grep -q "^## $V (unreleased)" CHANGELOG.md; then
   git add CHANGELOG.md && git commit -q -m "$V: finalize changelog" && echo "changelog heading finalized"
 fi
 tools/check-public.sh >/dev/null && echo "leak check clean"
+# docs/tools.md must match the tools' --help (CI checks it). Needs qemu-arm or an awake Kindle; otherwise skip with a warning.
+if command -v qemu-arm >/dev/null 2>&1 || command -v qemu-arm-static >/dev/null 2>&1 || tools/k4 wait 5 >/dev/null 2>&1; then
+  tools/gen-tools-doc.sh --check >/dev/null 2>&1 || { echo "release: docs/tools.md is out of date: run tools/gen-tools-doc.sh and commit" >&2; exit 1; }
+  echo "tools doc current"
+else
+  echo "release: cannot check docs/tools.md here (no qemu-arm, Kindle asleep); CI will"
+fi
 git push origin main
 sha=$(git rev-parse --short HEAD)
 echo "waiting for CI on $sha ..."
