@@ -9,6 +9,7 @@ User-facing notes per release. The release workflow publishes the section matchi
   k4home shows one screensaver image on the way to sleep (random from `/mnt/us/kindle4ever/screensavers/*.png`, else Amazon's
   stock set) and redraws on wake; `/mnt/us/kindle4ever/WAKE_EVERY`
   (seconds) arms powerd's RTC alarm at `readyToSuspend` for scheduled wakes, absent by default so only the power button wakes it.
+- `tools/k4 hold` / `wait`, `tools/twin.sh status` / `reset`, `tools/release.sh`: the small tools the day's work kept needing.
 - **k4draw `-a` auto refresh**: snapshots the screen at start, diffs at the end, refreshes only the changed box partially, and
   flashes when the box covers 60% of the screen, 30% of pixels changed, or after 10 partials (ghosting). Live station uses it,
   so a 5-minute refresh that only moves a few times no longer flashes the whole panel.

@@ -30,3 +30,15 @@ If the Kindle is unreachable, run `tools/find-kindle.ps1` / `.sh`. A mounted USB
 - **Ship it**: put scripts in `device/bin/` and binaries in `build/`, then `tools/k4 deploy` (or `tools/install.sh`). Everything lands in `/mnt/us/kindle4ever/bin`.
 - **Before you change the device**: back up ([docs/recovery.md](docs/recovery.md)), only touch `/` between `mntroot rw` and `mntroot ro`, and keep big files out of `/tmp` and `/var`.
 - **Don'ts**: `preventScreenSaver 1` (it disables the power button); stripping CRs on the device (BusyBox `sed` eats `r`); factory resetting the Kindle.
+
+## Gotchas (each cost real time once)
+- The Kindle sleeps 3 min after the last key by default and only the power button wakes it. Run `tools/k4 hold` before a
+  session of deploys, and `tools/k4 wait` after asking for the button. Liveness = SSH; the firewall drops ping.
+- BusyBox 1.7.2 sh/awk: `or`, `and`, `xor` are built-in functions (not variable names); `sleep` takes whole seconds (use
+  `usleep`); `case $(cmd) in` nested in another case fails to parse; awk counts bytes, so run GNU awk with `LC_ALL=C` when
+  testing on a PC. `sh -n` on the device (or `tools/twin.sh arm "sh -n file"`) catches the parse errors; `tools/ci-sim.sh` does it in CI.
+- A shell `trap` only runs after the current foreground command ends, so a signal cannot interrupt a blocked `k4keys -1`.
+  Act in the listener itself (k4home keeps its selection in a file for that).
+- `powerd_test -h` is a power-button *hold*, not help. `lipc-set-prop powerd rtcWakeup` is only accepted during `readyToSuspend`.
+- Scripts run from `/mnt/us` die when a PC mounts the USB drive and are read lazily by the shell: copy to `/var/run` and exec that (k4home does).
+- Device scripts hard-code `/mnt/us/kindle4ever`; the twin provides it, CI relocates PATH with sed. Keep new device paths behind variables.

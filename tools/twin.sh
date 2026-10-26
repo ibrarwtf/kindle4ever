@@ -7,6 +7,7 @@
 #   tools/twin.sh arm-setup <img>     exact mode: unpack the Kindle rootfs (partition 1 of a `dd` backup, see docs/recovery.md)
 #                                     and run its real busybox under qemu-arm. The rootfs is Amazon's and yours: never share it.
 #   tools/twin.sh arm <cmd...>        run a command inside that rootfs (the Kindle's own sh/awk/sed), /mnt/us mapped like host mode.
+#   tools/twin.sh status | reset      list, or kill, twin processes left over from earlier runs (k4home, k4keys, apps, listeners).
 # The screen is build/sim/screen.raw either way: watch it with tools/simweb.py (from Windows or here).
 set -e
 cd "$(dirname "$0")/.."
@@ -87,7 +88,16 @@ arm() {
   chroot "$ARM" /usr/bin/qemu-arm-static /bin/busybox sh -c "export PATH=/usr/local/k4:/mnt/us/kindle4ever/bin:/usr/sbin:/sbin:/usr/bin:/bin K4DRAW_FB=$SIM/screen.raw K4DRAW_TRACE=$SIM/trace.txt K4_SIM=$SIM TZ=\$(cat /etc/TZ 2>/dev/null || echo UTC); $*"
 }
 
+status() { ps -eo pid,etime,args | grep -e '/var/run/k4home' -e 'bin/k4keys' -e 'lipc-wait-event' -e 'apps/.*/app.sh' | grep -v grep || echo "no twin processes"; }
+reset() {
+  for p in $(ps -eo pid,args | grep -e '/var/run/k4home' -e 'bin/k4keys' -e 'lipc-wait-event' -e 'apps/.*/app.sh' | grep -v grep | awk '{print $1}'); do kill "$p" 2>/dev/null; done
+  rm -f "$SIM/keys.txt" "$SIM/events.txt" "$SIM/events.seen" /var/run/k4home.pid /var/run/k4home.app; : > "$SIM/keys.txt"
+  echo "twin processes stopped, key and event queues cleared"
+}
+
 case "$1" in
+  status) status ;;
+  reset) reset ;;
   setup) shift; setup "$@" ;;
   run) shift; run "$@" ;;
   arm-setup) shift; arm_setup "$@" ;;

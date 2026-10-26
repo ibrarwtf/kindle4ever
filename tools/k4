@@ -9,6 +9,8 @@
 #   k4 deploy                    copy device/bin + build/ binaries to the Kindle (install.sh does the full setup)
 #   k4 app <dir>                 install a home-screen app folder to /mnt/us/kindle4ever/apps/<name> (adds the DejaVu
 #                                Sans Mono font from vendor/ when present; tools/fetch-vendor.sh downloads it)
+#   k4 hold [minutes]            keep the Kindle awake while you work (default 10): resets powerd's idle timer every 2 min
+#   k4 wait [seconds]            block until the Kindle answers over SSH (after a power-button wake), default 600
 #   k4 doctor [--markdown]       self-test (tools/doctor.sh)
 #   k4 sim <k4draw args>         simulated screen on this computer (tools/sim)
 #   k4 version                   kindle4ever version on this computer and on the Kindle
@@ -58,9 +60,15 @@ case "$cmd" in
   deploy) for f in device/bin/*; do sh "$0" push "$f" "$D/bin/$(basename "$f")"; done
           for f in build/*; do [ -f "$f" ] && sh "$0" pushbin "$f" "$D/bin/$(basename "$f")"; done
           quiet k4_ssh "chmod +x $D/bin/*; ls $D/bin" ;;
+  hold) m=${1:-10}
+        quiet k4_ssh "n=\$(( $m * 30 )); ( i=0; while [ \$i -lt \$n ]; do lipc-set-prop com.lab126.powerd touchScreenSaverTimeout 1 >/dev/null 2>&1; sleep 2; i=\$((i+1)); done ) </dev/null >/dev/null 2>&1 & echo \$! > /var/run/k4-hold.pid; echo held awake for $m min" ;;
+  wait) s=${1:-600}; i=0
+        until timeout 6 ssh -q -i "$K4_SSH_KEY" -o "UserKnownHostsFile=${K4_KNOWN_HOSTS:-$K4_ROOT/.known_hosts}" -o StrictHostKeyChecking=accept-new -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa -o ConnectTimeout=5 "$K4_SSH_USER@$K4_HOST" true 2>/dev/null; do
+          i=$((i + 5)); [ $i -ge "$s" ] && { echo "k4 wait: no answer after $s s (asleep? press the power button)" >&2; exit 1; }; sleep 5
+        done; echo "kindle answers (after ~$i s)" ;;
   doctor) exec tools/doctor.sh "$@" ;;
   sim) exec tools/sim "$@" ;;
   version) echo "host:   $(k4_version)"
            printf 'device: '; quiet k4_ssh "cat $D/VERSION 2>/dev/null || echo 'not installed'" ;;
-  *) sed -n '2,16p' "$0"; exit 2 ;;
+  *) sed -n '2,18p' "$0"; exit 2 ;;
 esac

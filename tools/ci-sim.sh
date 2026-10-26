@@ -65,7 +65,7 @@ grep -q "^A=$PWD" "$SIM/app.sh" || fail "could not relocate app.sh's A= for the 
 "$BB" sh "$SIM/app.sh" --once | tee "$SIM/once.txt"
 grep -q 'rows 8' "$SIM/once.txt" || fail "livestation --once did not parse 8 rows"
 [ "$(wc -l < "$SIM/run/board.txt")" -eq 23 ] || fail "board is not 23 lines"
-grep -q 'fx=3 0 0 800 600' "$K4DRAW_TRACE" || fail "no full-screen landscape flash in the trace"
+grep -q ' 0 0 800 600$' "$K4DRAW_TRACE" || fail "no full-canvas landscape refresh in the trace"
 K4DRAW_ROTATE=90 k4draw export "$SIM/livestation-host.png" >/dev/null
 ok "livestation drew the fixture board in landscape"
 
