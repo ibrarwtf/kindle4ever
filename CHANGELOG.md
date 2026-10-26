@@ -2,6 +2,17 @@
 
 User-facing notes per release. The release workflow publishes the section matching the tag.
 
+## v1.4.0 (unreleased)
+
+- **Deep sleep by default.** `install.sh --sleep` sets powerd to screensaver after 3 min idle and suspend right after, the same
+  path the power button takes. boot.sh no longer keeps the device awake unless `/mnt/us/kindle4ever/KEEP_AWAKE` exists.
+  k4home shows one screensaver image on the way to sleep (random from `/mnt/us/kindle4ever/screensavers/*.png`, else Amazon's
+  stock set) and redraws on wake; `/mnt/us/kindle4ever/WAKE_EVERY`
+  (seconds) arms powerd's RTC alarm at `readyToSuspend` for scheduled wakes, absent by default so only the power button wakes it.
+- **k4draw `-a` auto refresh**: snapshots the screen at start, diffs at the end, refreshes only the changed box partially, and
+  flashes when the box covers 60% of the screen, 30% of pixels changed, or after 10 partials (ghosting). Live station uses it,
+  so a 5-minute refresh that only moves a few times no longer flashes the whole panel.
+
 ## v1.3.0
 
 - **Simulator, second stage.** `tools/sim serve` opens a local page with the simulated screen, the 13 buttons and keyboard

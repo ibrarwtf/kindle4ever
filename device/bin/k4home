@@ -6,6 +6,10 @@
 # screen change, which is also what clears ghosting). Home redraws. Inside the Reader, hold the Keyboard key
 # for about 1.5 s to come back here (Amazon's UI gets the key too, so its keyboard may flash up first).
 # Status bar: time, cpu % and ram % used, Wi-Fi, battery.
+# Sleep: when powerd heads for the screensaver (power button or idle) k4home shows one screensaver image, picked at random
+# from /mnt/us/kindle4ever/screensavers/*.png (else Amazon's stock set), unless an app owns the screen, and redraws itself on
+# wake. If /mnt/us/kindle4ever/WAKE_EVERY holds a number of seconds, the RTC alarm is armed at readyToSuspend so the device
+# wakes by itself; without the file nothing wakes it but the power button.
 # Items: Reader (Amazon's stock UI, started with the time zone from install.sh --tz), About (k4about), and one cell per app
 # found in /mnt/us/kindle4ever/apps/<name>/app.sh. An app is a script with a "# name: Label" line; it is run with the
 # screen already ours (framework stopped) and keys free, and it returns when the user presses Back or Home.
@@ -135,20 +139,46 @@ run_reader() {
   k4app on >/dev/null
 }
 
+# lock screen: one random screensaver image, full flash so nothing ghosts while asleep
+SS_DIR=/mnt/us/kindle4ever/screensavers
+lock() {
+  dir=$SS_DIR; [ -n "$(ls $dir/*.png 2>/dev/null)" ] || dir=/opt/amazon/screen_saver/600x800
+  n=$(ls $dir/*.png 2>/dev/null | wc -l)
+  if [ "$n" -gt 0 ]; then
+    pick=$(( $(date +%S) % n + 1 )); img=$(ls $dir/*.png | sed -n "${pick}p")
+    k4draw -F image "$img"
+  else
+    k4draw -F clear
+  fi
+}
+# powerd events: lock on the way down, arm the RTC if asked, redraw on the way up (only while no app owns the screen).
+# The listener is a background subshell, so the current selection is kept in a file for it.
+APP_RUNNING=/var/run/k4home.app; SELF=/var/run/k4home.sel
+( lipc-wait-event -m com.lab126.powerd goingToScreenSaver,readyToSuspend,outOfScreenSaver 2>/dev/null | while read -r ev _; do
+    case "$ev" in
+      goingToScreenSaver) [ -f $APP_RUNNING ] || lock ;;
+      readyToSuspend) w=$(cat /mnt/us/kindle4ever/WAKE_EVERY 2>/dev/null); [ -n "$w" ] && lipc-set-prop -i com.lab126.powerd rtcWakeup "$w" ;;
+      outOfScreenSaver) [ -f $APP_RUNNING ] || draw "$(cat $SELF 2>/dev/null || echo 0)" | k4draw -F - ;;
+    esac
+  done ) &
+rm -f $APP_RUNNING; echo 0 > $SELF
+
 [ "$(k4app status)" = "framework running" ] && k4app on >/dev/null
 sel=0
 draw $sel | k4draw -F -
 while key=$(k4keys -1); do
   case $key in
-    left|up|lprev|rprev)      old=$sel; sel=$(( (sel + N - 1) % N )); move $old $sel ;;
-    right|down|lnext|rnext)   old=$sel; sel=$(( (sel + 1) % N ));     move $old $sel ;;
+    left|up|lprev|rprev)      old=$sel; sel=$(( (sel + N - 1) % N )); echo $sel > $SELF; move $old $sel ;;
+    right|down|lnext|rnext)   old=$sel; sel=$(( (sel + 1) % N ));     echo $sel > $SELF; move $old $sel ;;
     home|back|menu)           draw $sel | k4draw -F - ;;
     select)
+      touch $APP_RUNNING
       it=$(item_at $sel); case $it in
         reader) run_reader ;;
         about)  k4about ;;
         app:*)  /bin/sh "$APPS/${it#app:}/app.sh" >> /var/log/k4-home.log 2>&1 ;;
       esac
+      rm -f $APP_RUNNING
       draw $sel | k4draw -F - ;;
   esac
 done

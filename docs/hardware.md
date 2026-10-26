@@ -50,6 +50,7 @@ not forum lore. See [findings.md](findings.md) for claims we checked.
   - `powerd_test -p` simulates a power button press. `-h` is a power-button *hold* (sleep with Wi-Fi off), not help.
 - Battery: `/sys/devices/system/yoshi_battery/yoshi_battery0/` (`battery_capacity`, `battery_mAH`, `battery_lmd`, ...) or `gasgauge-info -c`.
   A 13-year-old cell reported about 800 mAh full capacity.
+- **kindle4ever's defaults** (`install.sh --sleep`): `t1_timeout` 180 s, `t2_timeout` 2 s, no keep-awake, no RTC wake unless `WAKE_EVERY` exists.
 - **Sleep and wake by RTC (tested 2026-10-26):** powerd owns the RTC alarm. Sequence after a power-button press (`powerd_test -p`):
   screenSaver, after `t2_timeout` = 60 s `readyToSuspend` (Wi-Fi goes down here), after a grace of about 45 s `suspending`, then suspend.
   `lipc-set-prop -i com.lab126.powerd rtcWakeup <seconds>` is accepted **only while in readyToSuspend** (`lipcPropErrInvalidState`

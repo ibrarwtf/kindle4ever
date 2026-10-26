@@ -34,12 +34,16 @@ if [ -f /mnt/us/DONT_START_FRAMEWORK ] && [ -x /mnt/us/kindle4ever/bin/k4home ];
   echo "k4home started"
 fi
 
-# Keep-awake: reset the 10-min idle timer every 2 min while the device is active, so it never
-# auto-sleeps but the power button still locks it. In screensaver the property is rejected,
-# so this never wakes a device the user put to sleep.
-echo "keep-awake loop started up=$(cut -d' ' -f1 /proc/uptime)"
-while :; do
-  [ "$(lipc-get-prop com.lab126.powerd state 2>/dev/null)" = "active" ] &&
-    lipc-set-prop com.lab126.powerd touchScreenSaverTimeout 1 >/dev/null 2>&1
-  sleep 120
-done
+# Deep sleep is the default: powerd suspends the device after its idle timer (install.sh --sleep sets 3 min + 10 s)
+# and on the power button; only the power button wakes it (k4home arms the RTC when /mnt/us/kindle4ever/WAKE_EVERY exists).
+# Opt out with /mnt/us/kindle4ever/KEEP_AWAKE: then the idle timer is reset every 2 min while the device is active
+# (the power button still locks it; in screensaver the property is rejected, so this never wakes a sleeping device).
+if [ -f /mnt/us/kindle4ever/KEEP_AWAKE ]; then
+  echo "keep-awake loop started up=$(cut -d' ' -f1 /proc/uptime)"
+  while :; do
+    [ "$(lipc-get-prop com.lab126.powerd state 2>/dev/null)" = "active" ] &&
+      lipc-set-prop com.lab126.powerd touchScreenSaverTimeout 1 >/dev/null 2>&1
+    sleep 120
+  done
+fi
+echo "boot.sh done (deep sleep by default)"

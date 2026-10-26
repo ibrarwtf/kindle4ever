@@ -37,7 +37,7 @@ tools/setup-toolchain.sh && tools/fetch-vendor.sh && tools/build.sh   # on your 
 tools/stage-usb.sh /d jailbreak        # then restart the Kindle into the jailbreak
 tools/stage-usb.sh /d usbnet-install   # then Update Your Kindle
 tools/stage-usb.sh /d usbnet-config    # then restart and join Wi-Fi
-tools/install.sh --amazon-block --amazon-off --no-browser --tz Asia/Kolkata --start
+tools/install.sh --amazon-block --amazon-off --no-browser --tz Asia/Kolkata --home --sleep --start
 tools/k4 sh k4welcome                # your Kindle, running your code
 ```
 The full walkthrough, with what to press on the Kindle at each step and a risk level for each: [docs/setup.md](docs/setup.md).

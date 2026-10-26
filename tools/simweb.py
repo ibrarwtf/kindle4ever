@@ -5,7 +5,8 @@ Keys pressed on the page are queued in <sim>/keys.txt for the simulated k4keys (
 exported from <sim>/screen.raw with the host k4draw, and refreshes recorded by K4DRAW_TRACE=<sim>/trace.txt are drawn
 as outlines (dashed = partial, solid = full flash). Standard library only; runs on Windows or Linux (WSL).
 Keyboard: arrows = 5-way, Enter = select, PageUp/PageDown or [ ] = left page keys, , . = right page keys,
-          h = home, m = menu, Backspace/b = back, k = keyboard key, shift+k = hold keyboard 1.5 s, r = turn device.
+          h = home, m = menu, Backspace/b = back, k = keyboard key, shift+k = hold keyboard 1.5 s, r = turn device,
+          p = power button (queues powerd's goingToScreenSaver/readyToSuspend, then outOfScreenSaver, for the simulated lipc-wait-event).
 """
 import json, os, subprocess, sys, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -16,7 +17,7 @@ args = sys.argv[1:]
 PORT = int(args[args.index('--port') + 1]) if '--port' in args else 8470
 SIM = args[args.index('--sim') + 1] if '--sim' in args else os.path.join(ROOT, 'build', 'sim')
 os.makedirs(SIM, exist_ok=True)
-RAW, KEYS, TRACE = (os.path.join(SIM, n) for n in ('screen.raw', 'keys.txt', 'trace.txt'))
+RAW, KEYS, TRACE, EVENTS = (os.path.join(SIM, n) for n in ('screen.raw', 'keys.txt', 'trace.txt', 'events.txt'))
 K4DRAW = next((p for p in (os.path.join(ROOT, 'build', 'host', 'k4draw.exe'), os.path.join(ROOT, 'build', 'host', 'k4draw')) if os.path.exists(p)), None)
 
 PAGE = r'''<!doctype html><html><head><meta charset="utf-8"><title>kindle4ever sim</title>
@@ -56,6 +57,7 @@ small{color:#999}
 <div id="panel">
   <b>kindle4ever simulator</b><br>
   <button id="turn">Turn device (r)</button> <button id="clr">Clear trace</button> <label><input type="checkbox" id="trace" checked> show refreshes</label><br>
+  <button id="pwr" title="power button: sleep when awake, wake when asleep (p)">Power button (p)</button> <span id="pstate">awake</span><br>
   <small>arrows/Enter = 5-way · [ ] and , . = page keys · h m b k = home menu back kbd · shift+k = hold kbd</small>
   <p>Refreshes: <span id="cnt">0</span> partial, <span id="flash">0</span> full · queue: <span id="q">0</span></p>
   <div id="log"></div>
@@ -65,8 +67,11 @@ const img=document.getElementById('img'), ov=document.getElementById('ov'), ctx=
 function key(k, hold){ fetch('/key?name='+k+(hold?'&hold='+hold:''),{method:'POST'}); const b=document.querySelector('[data-k="'+k+'"]'); if(b){b.classList.add('on'); setTimeout(()=>b.classList.remove('on'),150);} }
 document.querySelectorAll('[data-k]').forEach(b=>b.onclick=e=>key(b.dataset.k, (b.dataset.k==='kbd'&&e.shiftKey)?1500:0));
 const map={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',Enter:'select',PageUp:'lprev',PageDown:'lnext','[':'lprev',']':'lnext',',':'rprev','.':'rnext',h:'home',m:'menu',b:'back',Backspace:'back',k:'kbd'};
-document.addEventListener('keydown',e=>{ if(e.key==='r'){turn();return;} if(e.key==='K'){key('kbd',1500);return;} const k=map[e.key]; if(k){e.preventDefault(); key(k);} });
+document.addEventListener('keydown',e=>{ if(e.key==='r'){turn();return;} if(e.key==='p'){power();return;} if(e.key==='K'){key('kbd',1500);return;} const k=map[e.key]; if(k){e.preventDefault(); key(k);} });
 function turn(){document.body.classList.toggle('turn');}
+let asleep=false;
+function power(){ asleep=!asleep; fetch('/event?name='+(asleep?'goingToScreenSaver,readyToSuspend':'outOfScreenSaver'),{method:'POST'}); document.getElementById('pstate').textContent=asleep?'asleep (screensaver shown, powerd would suspend)':'awake'; }
+document.getElementById('pwr').onclick=power;
 document.getElementById('turn').onclick=turn;
 document.getElementById('clr').onclick=()=>fetch('/trace?clear=1',{method:'POST'});
 let seen=0;
@@ -138,10 +143,15 @@ class H(BaseHTTPRequestHandler):
         if u.path == '/key':
             name = q.get('name', [''])[0]; hold = q.get('hold', ['0'])[0]
             if name:
-                with open(KEYS, 'a') as f: f.write(f'{name} {hold}\n')
+                with open(KEYS, 'a', newline='\n') as f: f.write(f'{name} {hold}\n')
             return self.send(200, b'ok')
         if u.path == '/trace':
             open(TRACE, 'w').close(); return self.send(200, b'ok')
+        if u.path == '/event':
+            for name in q.get('name', [''])[0].split(','):
+                if name:
+                    with open(EVENTS, 'a', newline='\n') as f: f.write(name + '\n')
+            return self.send(200, b'ok')
         self.send(404, b'not found')
 
 if __name__ == '__main__':

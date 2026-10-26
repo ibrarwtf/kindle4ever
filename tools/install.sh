@@ -1,12 +1,14 @@
 #!/bin/sh
 # Install (or update) the devkit on a jailbroken Kindle 4 NT that has USBNetwork SSH working.
-#   tools/install.sh [--amazon-block] [--amazon-off] [--no-browser] [--tz ZONE] [--home] [--no-boot-hook] [--start]
+#   tools/install.sh [--amazon-block] [--amazon-off] [--no-browser] [--tz ZONE] [--home] [--sleep] [--no-boot-hook] [--start]
 #     --amazon-block   add the Amazon-services block to /etc/hosts (device/rootfs/etc/hosts.amazon-block)
 #     --amazon-off     stop and disable Amazon's phone-home (phd) and transfer (tmd) daemons,
 #                      and point the stock clock sync at pool.ntp.org instead of Amazon (docs/amazon.md)
 #     --no-browser     stop and disable the experimental web browser (webreader, browserd): frees ~21 MB RAM
 #     --tz ZONE        set the time zone (Asia/Kolkata, Europe/Berlin, or a fixed offset like IST-5:30); the stock system is UTC
 #     --home           boot into kindle4ever's home screen (k4home) instead of Amazon's UI; the Reader item starts Amazon's UI
+#     --sleep          deep sleep: screensaver after 3 min idle or the power button, suspend right after (powerd's own grace
+#                      of ~45 s applies); #                      timers in kdb (originals saved to /etc/kdb.k4-orig), takes effect at the next boot or powerd restart
 #     --no-boot-hook   don't install /etc/init.d/k4-boot (boot.sh won't run at boot)
 #     --start          (re)start boot.sh now instead of waiting for the next reboot
 # Safe to run again: it updates files in place. Build first: tools/build.sh
@@ -24,7 +26,7 @@ set -e
 cd "$K4_ROOT"
 K=tools/k4
 D=$K4_DEVICE_DIR
-AMAZON=0 AMAZON_OFF=0 NOBROWSER=0 TZONE="" HOMESCREEN=0 HOOK=1 START=0
+AMAZON=0 AMAZON_OFF=0 NOBROWSER=0 TZONE="" HOMESCREEN=0 SLEEP=0 HOOK=1 START=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --amazon-block) AMAZON=1 ;;
@@ -32,6 +34,7 @@ while [ $# -gt 0 ]; do
     --no-browser) NOBROWSER=1 ;;
     --tz) shift; TZONE=$1; [ -n "$TZONE" ] || { echo "--tz needs a zone" >&2; exit 2; } ;;
     --home) HOMESCREEN=1 ;;
+    --sleep) SLEEP=1 ;;
     --no-boot-hook) HOOK=0 ;;
     --start) START=1 ;;
     *) sed -n '2,19p' "$0"; exit 2 ;;
@@ -69,7 +72,7 @@ if [ $HOMESCREEN = 1 ]; then
   $K sh "touch /mnt/us/DONT_START_FRAMEWORK" && echo "home screen at boot: on (k4home replaces Amazon's UI; its Reader item starts it)"
 fi
 
-if [ $HOOK = 1 ] || [ $AMAZON = 1 ] || [ -n "$DISABLE" ] || [ -n "$POSIX_TZ" ]; then
+if [ $HOOK = 1 ] || [ $AMAZON = 1 ] || [ -n "$DISABLE" ] || [ -n "$POSIX_TZ" ] || [ $SLEEP = 1 ]; then
   [ $HOOK = 1 ] && $K push device/rootfs/etc/init.d/k4-boot /tmp/k4-boot
   [ $AMAZON = 1 ] && $K push device/rootfs/etc/hosts.amazon-block /tmp/k4-hosts-block
   echo "== root fs (mntroot rw ... ro)"
@@ -99,6 +102,10 @@ if [ $HOOK = 1 ] || [ $AMAZON = 1 ] || [ -n "$DISABLE" ] || [ -n "$POSIX_TZ" ]; 
       [ -f /etc/profile.k4-orig ] || cp /etc/profile /etc/profile.k4-orig
       grep -q 'k4-tz' /etc/profile || echo '[ -f /etc/TZ ] && export TZ=\$(cat /etc/TZ)  # k4-tz' >> /etc/profile
       echo 'time zone set: $TZONE ($POSIX_TZ)'
+    fi
+    if [ $SLEEP = 1 ]; then
+      [ -f /etc/kdb.k4-orig ] || printf 't1_timeout=%s\nt2_timeout=%s\n' \"\$(kdb get system/daemon/powerd/t1_timeout)\" \"\$(kdb get system/daemon/powerd/t2_timeout)\" > /etc/kdb.k4-orig
+      kdb set system/daemon/powerd/t1_timeout 180 && kdb set system/daemon/powerd/t2_timeout 2 && echo 'deep sleep timers set (idle 180 s, suspend right after)'
     fi
     if [ -f /tmp/k4-boot ]; then
       cp /tmp/k4-boot /etc/init.d/k4-boot; chmod 755 /etc/init.d/k4-boot

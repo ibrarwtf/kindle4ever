@@ -53,8 +53,8 @@ struct update_area {
 #define DEFAULT_FONT "/usr/java/lib/fonts/Helvetica_LT_65_Medium.ttf"
 
 static const char USAGE[] =
-"usage: k4draw [-n] [-F] <command> [args]     run one command\n"
-"       k4draw [-n] [-F] -                    run commands from stdin, one per line\n"
+"usage: k4draw [-n] [-F|-a] <command> [args]  run one command\n"
+"       k4draw [-n] [-F|-a] -                 run commands from stdin, one per line\n"
 "       k4draw --help | --version\n"
 "\n"
 "Gray is 0 = black ... 255 = white (the panel shows about 16 levels). Screen: 600x800, origin top-left.\n"
@@ -74,6 +74,8 @@ static const char USAGE[] =
 "Options:\n"
 "  -n   don't refresh the panel (change memory only)\n"
 "  -F   refresh with a flashing full update instead of a partial one\n"
+"  -a   auto: compare the screen before and after, refresh only the changed area partially, and flash\n"
+"       when the changed box covers 60% of the screen, 30% of the pixels changed, or after 10 partials (ghosting)\n"
 "Without -n, each command refreshes what it drew; in stdin mode one refresh covers everything at the end.\n"
 "\n"
 "Environment:\n"
@@ -101,7 +103,12 @@ static size_t fb_len;
 static int rot;
 static uint8_t *phys;          // the real framebuffer (or sim file buffer) while fb points at the canvas
 static int PW, PH, pstride;
-static int opt_norefresh, opt_flash;
+static int opt_norefresh, opt_flash, opt_auto;
+static uint8_t *snap;            // -a: copy of the screen when we started, to find what really changed
+#define AUTO_FLASH_FRACTION 0.30 // -a: flash when this fraction of the pixels changed, or the changed box covers AUTO_FLASH_AREA
+#define AUTO_FLASH_AREA 0.60     //     of the screen (a whole-screen redraw mostly rewrites white with white)...
+#define AUTO_FLASH_EVERY 10      // ...or after this many partial refreshes in a row (ghosting)
+#define AUTO_COUNTER "/var/run/k4draw.partials"
 static const char *font_path;  // NULL until first use: default_font()
 static unsigned char *font_data;
 static stbtt_fontinfo font;
@@ -418,7 +425,7 @@ static int run(int argc, char **argv) {
     } else if (!strcmp(cmd, "clear")) {
         int g = argc > 1 ? atoi(argv[1]) : 255;
         fill(0, 0, W, H, g);
-        if (!opt_norefresh) refresh(FX_SLOW, 0, 0, 0, 0);  // slow: always flashes, even if unchanged
+        if (!opt_norefresh && !opt_auto) refresh(FX_SLOW, 0, 0, 0, 0);  // slow: always flashes, even if unchanged
         return 1;
     } else if (!strcmp(cmd, "fill")) {
         NEED(6);
@@ -468,8 +475,44 @@ static int run(int argc, char **argv) {
     return 0;
 }
 
+// -a: compare the screen with the snapshot taken at start; refresh only what changed, flash when a lot changed
+// or after AUTO_FLASH_EVERY partial refreshes (e-ink ghosting). The counter lives in a tmpfs file (sim: next to the screen file).
+static void auto_flush(void) {
+    int x1 = W, y1 = H, x2 = -1, y2 = -1;
+    long changed = 0;
+    for (int y = 0; y < H; y++) {
+        const uint8_t *a = fb + (size_t)y * stride, *b = snap + (size_t)y * stride;
+        for (int x = 0; x < W; x++)
+            if (a[x] != b[x]) {
+                changed++;
+                if (x < x1) x1 = x;
+                if (x >= x2) x2 = x + 1;
+                if (y < y1) y1 = y;
+                if (y >= y2) y2 = y + 1;
+            }
+    }
+    if (!changed) return;
+    char cpath[1024];
+    if (sim_path) snprintf(cpath, sizeof cpath, "%s.partials", sim_path);
+    else snprintf(cpath, sizeof cpath, "%s", AUTO_COUNTER);
+    int partials = 0;
+    FILE *f = fopen(cpath, "r");
+    if (f) { if (fscanf(f, "%d", &partials) != 1) partials = 0; fclose(f); }
+    double area = (double)(x2 - x1) * (y2 - y1) / ((double)W * H);
+    int flash = (double)changed / ((double)W * H) >= AUTO_FLASH_FRACTION || area >= AUTO_FLASH_AREA || partials + 1 >= AUTO_FLASH_EVERY;
+    if (getenv("K4DRAW_DEBUG"))
+        fprintf(stderr, "k4draw: auto: %ld px changed (%.0f%%), box %d,%d %dx%d, partials so far %d -> %s\n", changed,
+                100.0 * changed / ((double)W * H), x1, y1, x2 - x1, y2 - y1, partials, flash ? "flash" : "partial");
+    if (flash) { refresh(FX_SLOW, 0, 0, 0, 0); partials = 0; }
+    else { refresh(FX_PARTIAL, x1, y1, x2 - x1, y2 - y1); partials++; }
+    f = fopen(cpath, "w");
+    if (f) { fprintf(f, "%d\n", partials); fclose(f); }
+}
+
 static void flush(void) {
-    if (opt_norefresh || dx2 < 0) return;
+    if (opt_norefresh) return;
+    if (opt_auto) { auto_flush(); return; }
+    if (dx2 < 0) return;
     if (opt_flash) refresh(FX_SLOW, 0, 0, 0, 0);
     else refresh(FX_PARTIAL, dx1, dy1, dx2 - dx1, dy2 - dy1);
 }
@@ -500,6 +543,7 @@ int main(int argc, char **argv) {
     for (; i < argc && argv[i][0] == '-' && argv[i][1]; i++) {
         if (!strcmp(argv[i], "-n")) opt_norefresh = 1;
         else if (!strcmp(argv[i], "-F")) opt_flash = 1;
+        else if (!strcmp(argv[i], "-a")) opt_auto = 1;
         else die("unknown option %s", argv[i]);
     }
     if (i >= argc) {
@@ -508,6 +552,11 @@ int main(int argc, char **argv) {
     }
     fb_open();
     rotate_open();
+    if (opt_auto) {   // remember what the panel shows now; flush() diffs against it
+        snap = malloc((size_t)stride * H);
+        if (!snap) die("out of memory%s", "");
+        memcpy(snap, fb, (size_t)stride * H);
+    }
     if (!strcmp(argv[i], "-")) {
         char line[2048], *av[16];
         while (fgets(line, sizeof line, stdin)) {

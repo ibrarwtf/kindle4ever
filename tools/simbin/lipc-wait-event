@@ -1,4 +1,22 @@
 #!/bin/sh
-# Simulated lipc-wait-event: nothing ever fires; honours -s SECONDS, otherwise waits forever.
-while [ $# -gt 0 ]; do case "$1" in -s) shift; sleep "$1"; exit 1 ;; esac; shift; done
-while :; do sleep 3600; done
+# Simulated lipc-wait-event: events come from $K4_SIM/events.txt (one name per line, appended by the viewer's Sleep/Wake buttons
+# or by hand). -m streams every new matching event; without -m it prints the first match and exits; -s SECONDS gives up.
+SIM=${K4_SIM:-build/sim}; E=$SIM/events.txt; touch "$E"
+multi=0; timeout=0; names=""
+while [ $# -gt 0 ]; do
+  case "$1" in -m) multi=1 ;; -s) shift; timeout=$1 ;; com.lab126.*) ;; *) names=$1 ;; esac
+  shift
+done
+seen=$(wc -l < "$E"); start=$(date +%s)
+while :; do
+  now=$(wc -l < "$E")
+  if [ "$now" -gt "$seen" ]; then
+    tail -n +"$((seen + 1))" "$E" | head -n "$((now - seen))" | tr -d '\r' | while read -r ev; do
+      case ",$names," in *",$ev,"*) echo "$ev"; echo "$ev" >> "$SIM/events.seen" ;; esac
+    done
+    seen=$now
+    [ $multi = 0 ] && [ -s "$SIM/events.seen" ] && { rm -f "$SIM/events.seen"; exit 0; }
+  fi
+  [ "$timeout" -gt 0 ] 2>/dev/null && [ $(( $(date +%s) - start )) -ge "$timeout" ] && exit 1
+  sleep 0.2
+done

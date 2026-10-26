@@ -36,7 +36,7 @@ draw() {   # page.html -> rows -> board text -> k4draw
   awk -v now="$(date +%H:%M)" -v date="$(date '+%a %d %b' | tr 'a-z' 'A-Z')" -v code="$CODE" -v name="$NAME" \
       -v llabel="$LEFT" -v rlabel="$RIGHT" -v rightside="$RIGHT_SIDE" -v platforms="${PLATFORMS:-1 2 3}" -f "$A/board.awk" $T/rows.txt > $T/board.txt
   awk -v mono="$A/DejaVuSansMono.ttf" -v title="$(printf '%s STATION' "$NAME" | tr 'a-z' 'A-Z')" -v left="$LEFT" -v right="$RIGHT" \
-      -f "$A/render.awk" $T/board.txt | k4draw -F -
+      -f "$A/render.awk" $T/board.txt | k4draw -a -
 }
 
 msg() { k4draw text 20 560 16 0 "$*"; }
