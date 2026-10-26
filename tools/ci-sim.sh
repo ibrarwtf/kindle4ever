@@ -37,7 +37,9 @@ cp build/host/k4draw "$STAGE/bin/"; cp device/bin/* "$STAGE/bin/"; cp tools/simb
 for a in apps/*/; do n=$(basename "$a"); mkdir -p "$STAGE/apps/$n"; cp -r "$a"* "$STAGE/apps/$n/"; cp "$MONO" "$STAGE/apps/$n/DejaVuSansMono.ttf"; done
 export PATH="$PWD/$STAGE/bin:$PATH"
 # k4home expects /mnt/us/kindle4ever/apps: point it at the stage with a sed'ed copy (the real path needs root to create)
-sed "s|^APPS=/mnt/us/kindle4ever/apps|APPS=$PWD/$STAGE/apps|" device/bin/k4home > "$SIM/k4home"
+# device scripts hard-code the Kindle's paths; CI has no /mnt/us, so point their PATH and app folder at the stage
+sed "s|^APPS=/mnt/us/kindle4ever/apps|APPS=$PWD/$STAGE/apps|; s|^export PATH=/mnt/us/kindle4ever/bin:|export PATH=$PWD/$STAGE/bin:|" device/bin/k4home > "$SIM/k4home"
+grep -q "^export PATH=$PWD" "$SIM/k4home" || fail "could not relocate k4home's PATH for the stage"
 rm -f "$K4DRAW_TRACE"
 "$BB" sh "$SIM/k4home" --draw 0 >/dev/null
 k4draw export "$SIM/home.png" --panel >/dev/null
@@ -57,7 +59,8 @@ PLATFORMS="1 2 3"
 EOF
 : > "$K4DRAW_TRACE"
 # app.sh writes to /var/run/<app>; redirect with a sed'ed copy as well (no root in CI)
-sed "s|^T=/var/run/livestation|T=$PWD/$SIM/run|; s|^A=\$(dirname \"\$0\")|A=$PWD/$STAGE/apps/livestation|" "$STAGE/apps/livestation/app.sh" > "$SIM/app.sh"
+sed "s|^T=/var/run/livestation|T=$PWD/$SIM/run|; s|^A=\$(dirname \"\$0\")|A=$PWD/$STAGE/apps/livestation|; s|^export PATH=/mnt/us/kindle4ever/bin:|export PATH=$PWD/$STAGE/bin:|" "$STAGE/apps/livestation/app.sh" > "$SIM/app.sh"
+grep -q "^export PATH=$PWD" "$SIM/app.sh" || fail "could not relocate app.sh's PATH for the stage"
 grep -q "^A=$PWD" "$SIM/app.sh" || fail "could not relocate app.sh's A= for the stage"
 "$BB" sh "$SIM/app.sh" --once | tee "$SIM/once.txt"
 grep -q 'rows 8' "$SIM/once.txt" || fail "livestation --once did not parse 8 rows"
