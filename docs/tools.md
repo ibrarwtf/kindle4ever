@@ -130,9 +130,10 @@ Keys: 5-way or page keys move (partial refresh of the two cells only), Select op
 screen change, which is also what clears ghosting). Home redraws. Inside the Reader, hold the Keyboard key
 for about 1.5 s to come back here (Amazon's UI gets the key too, so its keyboard may flash up first).
 Status bar: time, cpu % and ram % used, Wi-Fi, battery.
-Sleep: when powerd heads for the screensaver (power button or idle) k4home draws a lock screen (clock, date, battery)
-unless an app owns the screen, and redraws itself on wake. If /mnt/us/kindle4ever/WAKE_EVERY holds a number of seconds,
-the RTC alarm is armed at readyToSuspend so the device wakes by itself; without the file nothing wakes it but the button.
+Sleep: when powerd heads for the screensaver (power button or idle) k4home shows one screensaver image, picked at random
+from /mnt/us/kindle4ever/screensavers/*.png (else Amazon's stock set), unless an app owns the screen, and redraws itself on
+wake. If /mnt/us/kindle4ever/WAKE_EVERY holds a number of seconds, the RTC alarm is armed at readyToSuspend so the device
+wakes by itself; without the file nothing wakes it but the power button.
 Items: Reader (Amazon's stock UI, started with the time zone from install.sh --tz), About (k4about), and one cell per app
 found in /mnt/us/kindle4ever/apps/<name>/app.sh. An app is a script with a "# name: Label" line; it is run with the
 screen already ours (framework stopped) and keys free, and it returns when the user presses Back or Home.
