@@ -35,6 +35,8 @@ Environment:
                    Works on any computer; use export to look at it.
   K4DRAW_ROTATE=90  landscape: the screen is 800x600, drawn rotated for a device turned anticlockwise
                    (keypad on the right); 270 = turned clockwise. All commands and export use landscape coordinates.
+  K4DRAW_TRACE=FILE in sim mode, append one line per refresh (time, fx, x y w h) for the simulator's viewer
+  K4DRAW_FONTDIR=DIR use fonts from DIR when a command names one under /usr/java/lib/fonts/ (sim with the device's fonts)
   K4DRAW_FONT=PATH  default font (device: /usr/java/lib/fonts/Helvetica_LT_65_Medium.ttf;
                    sim: a system sans font if found)
   K4DRAW_DEBUG=1    print refresh timings to stderr
