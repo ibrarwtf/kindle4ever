@@ -2,7 +2,7 @@
 
 User-facing notes per release. The release workflow publishes the section matching the tag.
 
-## v1.3.0 (unreleased)
+## v1.3.0
 
 - **Simulator, second stage.** `tools/sim serve` opens a local page with the simulated screen, the 13 buttons and keyboard
   shortcuts; `tools/twin.sh` runs device scripts and apps unmodified on Linux/WSL against that screen (host mode), or inside the
