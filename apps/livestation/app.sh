@@ -5,6 +5,7 @@
 # busybox awk for parsing and layout, k4draw in landscape (K4DRAW_ROTATE=90, keypad on the right).
 # Config: station.conf next to this script (copy station.conf.example). Select = refresh now, Back/Home = exit.
 #   app.sh [--once]      --once: one fetch + draw with timings, then exit
+# Offline / simulator: LIVESTATION_FIXTURE=/path/page.html uses that saved NTES page instead of fetching.
 export PATH=/mnt/us/kindle4ever/bin:/usr/sbin:/sbin:/usr/bin:/bin
 [ -f /etc/TZ ] && { TZ=$(cat /etc/TZ); export TZ; }
 A=$(dirname "$0")
@@ -19,6 +20,7 @@ export K4DRAW_ROTATE=90
 urlenc() { printf '%s' "$1" | sed 's/ /+/g'; }
 
 fetch() {   # -> $T/page.html ; NTES wants a session cookie and a fresh CSRF field for every query
+  if [ -n "$LIVESTATION_FIXTURE" ]; then cp "$LIVESTATION_FIXTURE" $T/page.html; return; fi
   k4fetch -t 15 -i -H "User-Agent: $UA" -o $T/h0 "$B/" || return 1
   ck=$(grep -i '^Set-Cookie:' $T/h0 | sed 's/^[Ss]et-[Cc]ookie: *//; s/;.*//' | tr '\n' ';')
   k4fetch -t 15 -H "User-Agent: $UA" -H "Cookie: $ck" -H "Referer: $B/" -o $T/tok "$B/GetCSRFToken?t=0" || return 1

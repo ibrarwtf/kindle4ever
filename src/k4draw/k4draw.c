@@ -81,6 +81,8 @@ static const char USAGE[] =
 "                   Works on any computer; use export to look at it.\n"
 "  K4DRAW_ROTATE=90  landscape: the screen is 800x600, drawn rotated for a device turned anticlockwise\n"
 "                   (keypad on the right); 270 = turned clockwise. All commands and export use landscape coordinates.\n"
+"  K4DRAW_TRACE=FILE in sim mode, append one line per refresh (time, fx, x y w h) for the simulator's viewer\n"
+"  K4DRAW_FONTDIR=DIR use fonts from DIR when a command names one under /usr/java/lib/fonts/ (sim with the device's fonts)\n"
 "  K4DRAW_FONT=PATH  default font (device: /usr/java/lib/fonts/Helvetica_LT_65_Medium.ttf;\n"
 "                   sim: a system sans font if found)\n"
 "  K4DRAW_DEBUG=1    print refresh timings to stderr\n"
@@ -263,10 +265,18 @@ static void rect(int x, int y, int w, int h, int gray, int t) {
     fill(x + w - t, y, t, h, gray);
 }
 
+static const char *mapped_font(const char *path) {
+    static char buf[1024];
+    const char *dir = getenv("K4DRAW_FONTDIR"), *pre = "/usr/java/lib/fonts/";
+    if (!dir || !*dir || strncmp(path, pre, strlen(pre))) return path;
+    snprintf(buf, sizeof buf, "%s/%s", dir, path + strlen(pre));
+    return buf;
+}
+
 static void load_font(void) {
     if (font_data) return;
     if (!font_path) font_path = default_font();
-    FILE *f = fopen(font_path, "rb");
+    FILE *f = fopen(mapped_font(font_path), "rb");
     if (!f) die("can't open font %s", font_path);
     fseek(f, 0, SEEK_END);
     long n = ftell(f);
@@ -355,7 +365,19 @@ static void image(const char *path, int x, int y) {
 static int refresh(int fx, int x, int y, int w, int h) {
     int whole = w <= 0 || h <= 0 || (x <= 0 && y <= 0 && x + w >= W && y + h >= H);
     rotate_sync(x, y, whole ? 0 : w, whole ? 0 : h);
-    if (sim_path) return 0;  // simulated screen: nothing to refresh
+    if (sim_path) {  // simulated screen: nothing to refresh, but record what would have been refreshed
+        const char *tr = getenv("K4DRAW_TRACE");
+        if (tr && *tr) {
+            FILE *f = fopen(tr, "a");
+            if (f) {
+                if (whole) fprintf(f, "%ld fx=%d 0 0 %d %d\n", (long)time(NULL), fx, W, H);
+                else fprintf(f, "%ld fx=%d %d %d %d %d\n", (long)time(NULL), fx, clampi(x, 0, W), clampi(y, 0, H),
+                             clampi(x + w, 0, W) - clampi(x, 0, W), clampi(y + h, 0, H) - clampi(y, 0, H));
+                fclose(f);
+            }
+        }
+        return 0;
+    }
     double t0 = now_ms();
     int r = -1;
 #ifdef __linux__

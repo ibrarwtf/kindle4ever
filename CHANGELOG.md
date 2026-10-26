@@ -2,6 +2,19 @@
 
 User-facing notes per release. The release workflow publishes the section matching the tag.
 
+## v1.3.0 (unreleased)
+
+- **Simulator, second stage.** `tools/sim serve` opens a local page with the simulated screen, the 13 buttons and keyboard
+  shortcuts; `tools/twin.sh` runs device scripts and apps unmodified on Linux/WSL against that screen (host mode), or inside the
+  Kindle's own root filesystem under qemu-arm (`arm` mode, from your backup image: the Kindle's real busybox, awk and sh).
+  Simulated `k4keys`, `lipc-*`, `gasgauge-info`, `k4app` and `powerd_test` live in `tools/simbin/`.
+- k4draw: `K4DRAW_TRACE` records every refresh in sim mode (the viewer outlines partial regions and counts flashes);
+  `K4DRAW_FONTDIR` maps the device font folder to a local copy, so text measures as on the panel.
+- livestation: `LIVESTATION_FIXTURE=page.html` runs the whole pipeline offline.
+- CI: `tools/ci-sim.sh` parses every device script and awk program with busybox, draws k4home under busybox sh with the stubs,
+  runs the livestation pipeline on the fixture in landscape, and checks that the ARM k4draw (under qemu) renders pixel-identical
+  to the host build. No private files involved; the same script runs locally in WSL.
+
 ## v1.2.0
 
 - **k4draw landscape mode**: `K4DRAW_ROTATE=90` (device turned anticlockwise, keypad on the right) or `270`. Commands, the

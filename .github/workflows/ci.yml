@@ -19,7 +19,7 @@ jobs:
       - name: ShellCheck (POSIX sh, warnings and errors)
         run: |
           shellcheck -s sh -S warning tools/*.sh tools/k4 tools/kcc tools/sim tools/lib/*.sh \
-            device/bin/* device/kindle4ever/boot.sh device/rootfs/etc/init.d/k4-boot device/jailbreak/runme.sh examples/*.sh             apps/*/*.sh
+            device/bin/* device/kindle4ever/boot.sh device/rootfs/etc/init.d/k4-boot device/jailbreak/runme.sh examples/*.sh             apps/*/*.sh tools/simbin/*
 
       - name: Apps (awk pipelines against their fixtures, with busybox awk like the device)
         run: |
@@ -70,6 +70,11 @@ jobs:
           # a bad certificate must fail with exit 4
           set +e; qemu-arm build/k4fetch -o /dev/null -t 20 https://expired.badssl.com; rc=$?; set -e
           test "$rc" = 4
+
+      - name: Simulator checks (busybox parse, k4home and livestation on the simulated screen, ARM = host pixels)
+        run: |
+          sudo apt-get install -y -qq busybox >/dev/null
+          tools/ci-sim.sh
 
       - name: docs/tools.md matches the tools' --help
         run: tools/gen-tools-doc.sh --check

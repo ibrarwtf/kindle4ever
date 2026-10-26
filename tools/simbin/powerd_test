@@ -1,0 +1,3 @@
+#!/bin/sh
+# Simulated powerd_test: records the simulated power button in run.log; no sleep in the simulator.
+echo "$(date +%H:%M:%S) powerd_test $*" >> "${K4_SIM:-build/sim}/run.log"

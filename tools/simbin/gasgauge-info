@@ -1,0 +1,5 @@
+#!/bin/sh
+# Simulated gasgauge-info: -c capacity %, -m mAh, -s summary; battery level from $K4_SIM/state (powerd.battLevel) or 63.
+SIM=${K4_SIM:-build/sim}
+b=$(sed -n 's/^powerd.battLevel=//p' "$SIM/state" 2>/dev/null | tail -1); b=${b:-63}
+case "$1" in -c) echo "$b%" ;; -m) echo "$((b * 8))mAh" ;; *) echo "Battery: $b%" ;; esac

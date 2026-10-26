@@ -1,0 +1,5 @@
+#!/bin/sh
+# Simulated lipc-probe: a short fixed answer
+echo "com.lab126.powerd
+com.lab126.wifid
+com.lab126.pmond"

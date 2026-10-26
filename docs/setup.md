@@ -107,3 +107,23 @@ and point `K4_LEAKLIST` at it. CI runs the generic checks on every push.
 - BusyBox 1.7.2: no `grep -E`, no `nohup`, and `sed 's/\r//'` deletes the letter `r`. Strip CRs on your computer, as `tools/k4 push` does.
 - `preventScreenSaver 1` makes powerd ignore the power button. `boot.sh` uses `touchScreenSaverTimeout` instead.
 - SSH sessions get `PATH=/usr/bin:/bin`. `eips`, `lipc-*` and `mntroot` live in `/usr/sbin`, and `tools/k4` sets a full PATH.
+
+## Simulator
+Most UI work needs no Kindle. Three levels:
+1. `tools/sim <k4draw command>` draws into `build/sim/screen.raw`; `tools/sim show` exports it as the panel would show it.
+2. `tools/sim serve` opens http://localhost:8470 with the screen, the 13 buttons and keyboard shortcuts (arrows, Enter, [ ] , .
+   for page keys, h m b k). Presses are queued for the simulated `k4keys`; refreshes recorded by k4draw are outlined on the screen
+   (dashed = partial, red = flash), so you can see what a UI change costs the panel.
+3. `tools/twin.sh` (Linux or WSL, as root) runs the real scripts: `setup [FONTDIR]` links `/mnt/us/kindle4ever` to a staging copy of this
+   checkout with simulator stubs for lipc, powerd and the battery gauge, then `run device/bin/k4home` or `run apps/livestation/app.sh`.
+   Give `setup` a folder holding your own copy of the Kindle's `/usr/java/lib/fonts` so text measures exactly as on the device.
+   `arm-setup <backup.img>` unpacks the Kindle's root filesystem from your `dd` backup and `arm <cmd>` runs commands in it under
+   qemu-arm: the Kindle's own busybox 1.7.2 sh, awk and sed, which differ from GNU tools in ways that only show up there.
+   The rootfs is Amazon's and device-specific: it stays on your machine.
+
+   On Windows the viewer runs natively (`tools/sim serve`) and the twin runs in WSL on the same checkout, so they share `build/sim`:
+   `wsl -d Ubuntu -u root -- sh /mnt/c/.../tools/twin.sh run device/bin/k4home` in its own terminal, then press keys in the browser.
+   The twin sets `LC_ALL=C` because the Kindle has no locale; GNU awk in a UTF-8 locale would count characters where busybox counts
+   bytes and the train art would fall apart.
+4. `tools/ci-sim.sh` (Linux, also run by CI) is the regression suite built on all this: busybox parses every script, k4home and the
+   Live station app draw on the simulated screen, and the ARM k4draw under qemu must render exactly the host build's pixels.

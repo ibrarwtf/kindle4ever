@@ -36,10 +36,23 @@ $KCC -Wall "$DEF" -I third_party/bearssl/inc -I third_party/bearssl/src \
 echo "hello (example)"; $KCC -Wall -o build/hello examples/hello.c
 
 # k4draw for this computer too: the simulator (K4DRAW_FB=file, see tools/sim)
-ROOT=$(pwd); . tools/lib/zig.sh
+ROOT=$(pwd); export ROOT; . tools/lib/zig.sh
 mkdir -p build/host
-ext=; case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) ext=.exe ;; esac
-echo "k4draw (host simulator)"; "$ZIG" cc -O2 -s -Wall "$DEF" -o "build/host/k4draw$ext" src/k4draw/k4draw.c -lm
+# Explicit host target: under WSL the zig found may be the Windows one, which would otherwise build a Windows .exe
+ext=; target=
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) ext=.exe; target="-target x86_64-windows-gnu" ;;
+  Linux) target="-target $(uname -m)-linux-gnu" ;;
+  Darwin) target="-target $(uname -m | sed s/arm64/aarch64/)-macos" ;;
+esac
+# shellcheck disable=SC2086  # $target is two words on purpose
+echo "k4draw (host simulator)"; "$ZIG" cc -O2 -s -Wall "$DEF" $target -o "build/host/k4draw$ext" src/k4draw/k4draw.c -lm
+# k4fetch for this computer: the twin (tools/twin.sh) runs apps that fetch; Windows builds skip it (no POSIX sockets)
+if [ -z "$ext" ]; then
+  echo "k4fetch (host)"
+  # shellcheck disable=SC2046,SC2086  # word splitting of the file list and of $target is intended
+  "$ZIG" cc -O2 -s -Wall "$DEF" $target -I third_party/bearssl/inc -I third_party/bearssl/src     -o build/host/k4fetch src/k4fetch/k4fetch.c build/gen/k4fetch_tas.c $(find third_party/bearssl/src -name '*.c' | sort)
+fi
 rm -f build/host/*.pdb
 
 ls -l build/k4draw build/k4keys build/k4fetch build/hello

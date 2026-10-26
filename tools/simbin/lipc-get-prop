@@ -1,0 +1,14 @@
+#!/bin/sh
+# Simulated lipc-get-prop: values from $K4_SIM/state (key=value, keys like powerd.state), with device-like defaults.
+SIM=${K4_SIM:-build/sim}; S=$SIM/state
+src=${1#com.lab126.}; [ "$1" = "-i" ] || [ "$1" = "-s" ] && { src=${2#com.lab126.}; shift; }
+k="$src.$2"
+v=$(sed -n "s/^$k=//p" "$S" 2>/dev/null | tail -1)
+if [ -z "$v" ]; then
+  case "$k" in
+    powerd.state) v=active ;; powerd.battLevel) v=63 ;; powerd.isCharging) v=0 ;; powerd.status) v="Powerd state: Active" ;;
+    wifid.cmState) v=CONNECTED ;; wifid.signalStrength) v=5/5 ;; wifid.macAddress) v="(sim)" ;;
+    cmd.wirelessEnable) v=1 ;; *) v="" ;;
+  esac
+fi
+echo "$v"

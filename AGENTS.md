@@ -18,6 +18,9 @@ If the Kindle is unreachable, run `tools/find-kindle.ps1` / `.sh`. A mounted USB
 ## Build on top
 - **A script app**: a shell script that calls `k4app on`, draws with `k4draw`, reads buttons with `k4keys`, fetches with `k4fetch`, then `k4app off`.
   Example: `device/bin/k4about`. Try it on the PC first with `tools/sim`.
+- **Try it without the device**: `tools/sim serve` (viewer with buttons) plus, on Linux/WSL as root, `tools/twin.sh setup` once and
+  `tools/twin.sh run device/bin/k4home` or `tools/twin.sh run apps/livestation/app.sh`. Apps should read `LIVESTATION_FIXTURE`-style
+  variables for offline data. `tools/twin.sh arm` runs the Kindle's real busybox from your backup image when shell semantics matter.
 - **A home-screen app**: a folder with `app.sh` (comment lines `# name: Label` and `# version: x.y.z`), optionally `icon.sh CX CY` printing k4draw
   commands for its icon, installed with `tools/k4 app <folder>` to `/mnt/us/kindle4ever/apps/<name>/`. `k4home` shows it as a cell;
   when picked, it runs with the screen already yours and should return when the user presses Back or Home. Landscape apps set

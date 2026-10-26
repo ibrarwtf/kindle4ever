@@ -1,0 +1,3 @@
+#!/bin/sh
+# usleep for hosts without it (Ubuntu): microseconds -> fractional sleep
+sleep "$(awk -v u="$1" 'BEGIN{printf "%.3f", u/1000000}')"

@@ -1,0 +1,10 @@
+#!/bin/sh
+# Simulated k4app: there is no Amazon framework in the simulator; "on" clears the screen, "off" just reports.
+SIM=${K4_SIM:-build/sim}
+case "$1" in
+  on) k4draw clear >/dev/null; echo "framework stopped"; echo "$(date +%H:%M:%S) k4app on" >> "$SIM/run.log" ;;
+  off) echo "framework starting (UI back in ~30-60s)"; echo "$(date +%H:%M:%S) k4app off (no framework in the sim)" >> "$SIM/run.log"
+       k4draw -F text 40 380 28 0 "[sim] Amazon UI would be here" ;;
+  status) echo "framework stopped (app mode)" ;;
+  *) echo "usage: k4app on|off|status" >&2; exit 2 ;;
+esac

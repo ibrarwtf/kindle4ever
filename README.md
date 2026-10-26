@@ -66,7 +66,8 @@ The full walkthrough, with what to press on the Kindle at each step and a risk l
 |---|---|
 | `k4` | Drives the Kindle over SSH: `sh`, `shot` (timestamped screenshot), `press`, `push`, `run`, `deploy`, `doctor`, `sim`, `version` |
 | `doctor.sh` | Self-test of SSH, display, keys, network, boot hook, power and space. `--markdown` gives a shareable report. |
-| `sim` | The same `k4draw`, drawing into a file: see what the panel would show without a device |
+| `sim` | The same `k4draw`, drawing into a file: see what the panel would show without a device. `sim serve` adds a local page with buttons and keyboard |
+| `twin.sh` | Run device scripts and apps on Linux/WSL against the simulated screen, or inside the Kindle's own rootfs under qemu-arm ([docs/setup.md](docs/setup.md#simulator)) |
 | `install.sh` / `uninstall.sh` | Put kindle4ever on the Kindle (tools, a boot hook with a kill switch, Amazon block and phone-home off, browser off, time zone), or take it off. [docs/amazon.md](docs/amazon.md) explains the Amazon side |
 | `find-kindle.ps1` / `.sh` | Find the Kindle on your network. It also ejects the USB drive, which is what turns the Kindle's Wi-Fi off. |
 
