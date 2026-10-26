@@ -12,7 +12,7 @@ From mildest to most drastic. **Tested** = done on a real K4 NT (FW 4.1.4) while
 - Keep `tools/fetch-vendor.sh` downloads: the jailbreak and USBNetwork **uninstaller** .bins live there.
 
 ## Level 0: screen or UI stuck, SSH works (risk: none)
-- Wake from the screensaver: `tools/k4 sh powerd_test -p` (tested).
+- Wake from the screensaver: `tools/k4 sh powerd_test -p` (tested). **Never `powerd_test -h`**: it is not help, it simulates a power-button *hold*, which put the device to sleep with Wi-Fi off (tested, by accident).
 - Auto-sleep is held off by `boot.sh`, which resets the idle timer every 2 min while the device is active.
   Don't use `lipc-set-prop com.lab126.powerd preventScreenSaver 1`: powerd then **ignores the power button** (tested).
 - Give the screen back to Amazon's UI after app mode: `tools/k4 sh k4app off` (tested). Restart the UI: `/etc/init.d/framework restart`.

@@ -49,4 +49,5 @@ k4_ssh() {
 
 # PATH on the device for our commands (ssh sessions only get /usr/bin:/bin).
 # shellcheck disable=SC2034  # used by scripts that source this file
-K4_REMOTE_ENV="export PATH=$K4_DEVICE_DIR/bin:/usr/sbin:/sbin:/usr/bin:/bin:/mnt/us/usbnet/bin;"
+# TZ: the stock busybox ignores /etc/localtime and /etc/TZ, so pass the zone from /etc/TZ (set by install.sh --tz) as an env var.
+K4_REMOTE_ENV="export PATH=$K4_DEVICE_DIR/bin:/usr/sbin:/sbin:/usr/bin:/bin:/mnt/us/usbnet/bin; [ -f /etc/TZ ] && export TZ=\$(cat /etc/TZ);"

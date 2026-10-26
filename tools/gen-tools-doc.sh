@@ -25,7 +25,7 @@ help_sh() { awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "devic
   for t in k4draw k4keys k4fetch; do
     printf '\n## %s\n\n```\n' "$t"; help_bin "$t" | tr -d '\r'; printf '```\n'
   done
-  for t in k4press k4wait k4app k4about k4welcome k4logo; do
+  for t in k4press k4wait k4app k4home k4about k4welcome k4logo k4logs; do
     printf '\n## %s\n\n```\n' "$t"; help_sh "$t"; printf '```\n'
   done
 } > "$tmp"

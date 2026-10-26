@@ -1,7 +1,7 @@
 #!/bin/sh
 # Hand the screen to our own code, or give it back to Amazon's UI (the Java "framework").
 #   k4app on      stop the framework (screen + keys are ours), clear the screen
-#   k4app off     restart the framework (normal Kindle UI back)
+#   k4app off     restart the framework (normal Kindle UI back), even when the home screen holds it back at boot
 #   k4app status
 # Safety: rebooting always brings the framework back (nothing here is persistent).
 case "$1" in -h|--help) awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"; exit 0 ;; esac
@@ -21,7 +21,16 @@ case "$1" in
     echo "framework stopped"
     ;;
   off)
+    # Java wants the IANA zone name (install.sh --tz writes it); busybox would misread it, so only this process gets it.
+    tz=$(cat /mnt/us/kindle4ever/tz.java 2>/dev/null); [ -n "$tz" ] && export TZ=$tz
+    # Amazon's framework script refuses to start while the home-screen flag exists: lift it for the start, then put it back.
+    FLAG=/mnt/us/DONT_START_FRAMEWORK; flagged=0
+    [ -f $FLAG ] && { flagged=1; mv $FLAG $FLAG.paused; }
     /etc/init.d/framework start
+    if [ $flagged = 1 ]; then
+      i=0; until pidof cvm >/dev/null || [ $i -ge 30 ]; do i=$((i + 1)); sleep 1; done
+      mv $FLAG.paused $FLAG
+    fi
     echo "framework starting (UI back in ~30-60s)"
     ;;
   status)

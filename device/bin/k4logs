@@ -1,0 +1,30 @@
+#!/bin/sh
+# Show or clean the Kindle's logs. The stock system rotates /var/log (tmpfs) into /var/local/log (32 MB flash partition) every 15 min.
+#   k4logs                 sizes of the log areas and the oldest/newest archive
+#   k4logs clean [DAYS]    delete rotated archives in /var/local/log older than DAYS (default 30); keeps the live logs and tinyrot's counters
+#   k4logs tail [N]        last N lines of the live system log (default 30), without lipc chatter
+# Never deletes /var/log/messages, the *_oldest/*_youngest counters or anything outside /var/local/log and /mnt/us/system/logs.
+case "$1" in -h|--help) awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"; exit 0 ;; esac
+L=/var/local/log
+case "$1" in
+  clean)
+    days=${2:-30}
+    n=0
+    for f in $(find $L -name '*_[0-9]*_[0-9]*.gz' -mtime +"$days" 2>/dev/null) $(find /mnt/us/system/logs -type f -mtime +"$days" 2>/dev/null); do
+      rm -f "$f" && n=$((n + 1))
+    done
+    echo "removed $n archived log files older than $days days"
+    ;;
+  tail)
+    grep -v -e 'lipc:gsp' -e 'lipc:gip' -e 'lipc:sip' -e 'lipc:evts' -e 'EventArrived' /var/log/messages | tail -n "${2:-30}"
+    ;;
+  "")
+    echo "/var/log (tmpfs):     $(du -sk /var/log | cut -f1) KB, $(ls /var/log | wc -l) files"
+    echo "/var/local/log:       $(du -sk $L | cut -f1) KB, $(ls $L/*.gz 2>/dev/null | wc -l) archives, partition $(df -k /var/local | awk 'NR==2 {print $5" used, "$4" KB free"}')"
+    old=$(ls $L/*.gz 2>/dev/null | sed 's/.*_\([0-9]\{8\}\)[0-9]*\.gz/\1/' | sort | head -1)
+    new=$(ls $L/*.gz 2>/dev/null | sed 's/.*_\([0-9]\{8\}\)[0-9]*\.gz/\1/' | sort | tail -1)
+    [ -n "$old" ] && echo "archives from:        $old to $new"
+    [ -d /mnt/us/system/logs ] && echo "/mnt/us/system/logs:  $(du -sk /mnt/us/system/logs | cut -f1) KB"
+    ;;
+  *) echo "usage: k4logs [clean [DAYS] | tail [N]]" >&2; exit 2 ;;
+esac

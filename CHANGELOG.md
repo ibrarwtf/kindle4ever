@@ -2,6 +2,23 @@
 
 User-facing notes per release. The release workflow publishes the section matching the tag.
 
+## v1.1.0
+
+- **`install.sh --amazon-off`**: stops and disables Amazon's phone-home (`phd`) and transfer (`tmd`) daemons. `phd` retried Amazon
+  every 30-60 min and asked powerd for an RTC wakeup before each suspend, so a sleeping Kindle woke up to phone home. Also points the
+  stock clock sync (`/usr/sbin/updatetime`) at `pool.ntp.org`. New doc: `docs/amazon.md`, one place for everything Amazon-related.
+- **`install.sh --no-browser`**: stops and disables the experimental web browser (`webreader`, `browserd`, about 21 MB of RAM).
+- **`install.sh --tz <zone>`**: time zone for the device (zoneinfo file, `/etc/TZ`, and `TZ` exported by `boot.sh`, `tools/k4` and login shells,
+  because the stock busybox ignores the files). `tools/lib/tzfile.py` builds the zone file from your computer's tzdata or a fixed offset.
+- **`k4home`** and **`install.sh --home`**: a minimal home screen that replaces Amazon's UI at boot (Amazon's own `DONT_START_FRAMEWORK` flag):
+  status bar (clock, cpu %, ram %, Wi-Fi, battery), two items, Reader (starts Amazon's UI with the right time zone for Java) and About.
+  5-way to choose (only the two cells' border strips are redrawn and partially refreshed), Select to open (full flash on every screen
+  change), hold the Keyboard key in the Reader to come back. `k4about` clears the screen and returns to whoever called it.
+  `k4app off` lifts the home flag while Amazon's UI starts. Frees about 50 MB of RAM and the Java UI's CPU time.
+- **`k4logs`**: log sizes, `clean [DAYS]` for old archives in `/var/local/log`, `tail` without lipc chatter.
+- `uninstall.sh` reverses all of the above (rc5.d links, ntp, TZ, profile, home flag).
+- Findings: phd/RTC behaviour, powerd's `rtcWakeup` property, log history (starts 2025, not 2012), time zone handling.
+
 ## v1.0.0
 
 First public release: a jailbroken Kindle 4 NT (firmware 4.1.4) you, or an AI coding agent, can program over Wi-Fi.

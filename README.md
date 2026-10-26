@@ -37,7 +37,7 @@ tools/setup-toolchain.sh && tools/fetch-vendor.sh && tools/build.sh   # on your 
 tools/stage-usb.sh /d jailbreak        # then restart the Kindle into the jailbreak
 tools/stage-usb.sh /d usbnet-install   # then Update Your Kindle
 tools/stage-usb.sh /d usbnet-config    # then restart and join Wi-Fi
-tools/install.sh --amazon-block --start
+tools/install.sh --amazon-block --amazon-off --no-browser --tz Asia/Kolkata --start
 tools/k4 sh k4welcome                # your Kindle, running your code
 ```
 The full walkthrough, with what to press on the Kindle at each step and a risk level for each: [docs/setup.md](docs/setup.md).
@@ -61,7 +61,7 @@ The full walkthrough, with what to press on the Kindle at each step and a risk l
 | `k4` | Drives the Kindle over SSH: `sh`, `shot` (timestamped screenshot), `press`, `push`, `run`, `deploy`, `doctor`, `sim`, `version` |
 | `doctor.sh` | Self-test of SSH, display, keys, network, boot hook, power and space. `--markdown` gives a shareable report. |
 | `sim` | The same `k4draw`, drawing into a file: see what the panel would show without a device |
-| `install.sh` / `uninstall.sh` | Put kindle4ever on the Kindle (tools, a boot hook with a kill switch, an optional Amazon block), or take it off |
+| `install.sh` / `uninstall.sh` | Put kindle4ever on the Kindle (tools, a boot hook with a kill switch, Amazon block and phone-home off, browser off, time zone), or take it off. [docs/amazon.md](docs/amazon.md) explains the Amazon side |
 | `find-kindle.ps1` / `.sh` | Find the Kindle on your network. It also ejects the USB drive, which is what turns the Kindle's Wi-Fi off. |
 
 Settings (IP, MAC, key path) come from environment variables or a `k4.env` file ([example](k4.env.example)), so nothing personal lives in the repo.

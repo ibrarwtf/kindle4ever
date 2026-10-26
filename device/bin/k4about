@@ -27,7 +27,7 @@ up=$(awk '{s=int($1); d=int(s/86400); h=int(s%86400/3600); m=int(s%3600/60);
            if (d) printf "%dd %dh %dm", d, h, m; else if (h) printf "%dh %dm", h, m; else printf "%dm", m}' /proc/uptime)
 devkit=$(cat /mnt/us/kindle4ever/VERSION 2>/dev/null || echo "not installed")
 shell=$(busybox 2>&1 | head -1 | cut -d' ' -f1-2)
-now=$(date '+%H:%M UTC  %a %d %b %Y')
+now=$(date '+%H:%M %Z  %a %d %b %Y')
 
 draw() {
   k4logo 40 40 1   # the devkit logo, neofetch-style
@@ -70,7 +70,9 @@ if [ "$1" = "--draw" ]; then
   { echo "clear"; draw; } | k4draw -F -
   exit 0
 fi
-k4app on >/dev/null
-HINT=1 draw | k4draw -
+# Called from k4home (framework already stopped)? Then just draw and return; otherwise take the screen and give it back.
+if [ "$(k4app status)" = "framework running" ]; then ours=0; k4app on >/dev/null; else ours=1; fi
+{ echo clear; HINT=1 draw; } | k4draw -F -
 k4keys -1 >/dev/null
-k4app off >/dev/null
+[ $ours = 0 ] && k4app off >/dev/null
+exit 0

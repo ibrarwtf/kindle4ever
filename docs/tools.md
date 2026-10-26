@@ -109,9 +109,22 @@ Prints elapsed ms. Exit 0 = stable, 1 = timed out.
 ```
 Hand the screen to our own code, or give it back to Amazon's UI (the Java "framework").
   k4app on      stop the framework (screen + keys are ours), clear the screen
-  k4app off     restart the framework (normal Kindle UI back)
+  k4app off     restart the framework (normal Kindle UI back), even when the home screen holds it back at boot
   k4app status
 Safety: rebooting always brings the framework back (nothing here is persistent).
+```
+
+## k4home
+
+```
+Home screen: a small launcher that replaces Amazon's UI at boot (install.sh --home) and keeps a way back to it.
+  k4home             take the screen (stops Amazon's UI if it is running) and run the menu until reboot
+  k4home --draw [N]  draw once with item N (0-based) highlighted, no keys; for screenshots and tools/sim
+Keys: 5-way or page keys move (partial refresh of the two cells only), Select opens (full flash on every
+screen change, which is also what clears ghosting). Home redraws. Inside the Reader, hold the Keyboard key
+for about 1.5 s to come back here (Amazon's UI gets the key too, so its keyboard may flash up first).
+Status bar: time, cpu % and ram % used, Wi-Fi, battery.
+Items: Reader (Amazon's stock UI, started with the time zone from install.sh --tz) and About (k4about).
 ```
 
 ## k4about
@@ -138,4 +151,14 @@ Print k4draw commands for the devkit logo: a Kindle 4 drawn from rectangles.
                                   "name" adds the kindle4ever wordmark under the device (+34 px)
 Optional: K4LOGO_BODY (body gray, default 0 = black), K4LOGO_SIDE ("INSET WIDTH GRAY MODE" page-turn buttons, "" = none)
   e.g.  k4logo 225 80 1 | k4draw -
+```
+
+## k4logs
+
+```
+Show or clean the Kindle's logs. The stock system rotates /var/log (tmpfs) into /var/local/log (32 MB flash partition) every 15 min.
+  k4logs                 sizes of the log areas and the oldest/newest archive
+  k4logs clean [DAYS]    delete rotated archives in /var/local/log older than DAYS (default 30); keeps the live logs and tinyrot's counters
+  k4logs tail [N]        last N lines of the live system log (default 30), without lipc chatter
+Never deletes /var/log/messages, the *_oldest/*_youngest counters or anything outside /var/local/log and /mnt/us/system/logs.
 ```

@@ -29,11 +29,11 @@ BusyBox 1.7.2's `grep` has no `-E`, so on-device regex searches silently find no
 | Amazon strips the Java dev keystore on contact | Not tested. kindle4ever doesn't use Kindlets/KUAL. | Irrelevant here |
 | Don't factory reset (end of support) | — | **Adopted** as a rule |
 | Power button | With `preventScreenSaver 1` set, syslog shows `Prevent screen saver set. Ignoring power button` | Use `touchScreenSaverTimeout` instead (boot.sh does) |
+| `tphd`/`phd` phone home (forum lore, no K4 source) | `phd` runs on the K4: retries the todo server every 30-60 min, asks powerd for an RTC wakeup before suspend, listens on TCP 40317 | **True and worse than described**. `install.sh --amazon-off` disables it |
+| RTC wake needs `rtcwake` or raw sysfs writes (kindle-dash) | powerd has a writable `rtcWakeup` property (`lipc-set-prop com.lab126.powerd rtcWakeup <s>`), which is what phd uses | **Simpler path exists**, see hardware.md |
+| The K4 uses upstart (`initctl stop webreader`, kindle-dash) | SysV only; `webreader`/`browserd` are stopped via `lipc-set-prop com.lab126.pmond stop <name>` (browserd also needs `killall`) | **False** for the K4 |
+| Removing the `loginfo` cron lines is safe, keep `tinyrot` (NiLuJe) | `/etc/crontab/root` matches the forum copy; `/var/local` is 32 MB mounted `sync` | **Agreed**, not changed by kindle4ever |
+| Time zone can be set with a zoneinfo file at `/var/local/system/tz` (PW2 guide) | The symlink exists but the stock busybox ignores both it and `/etc/TZ`; only `TZ=IST-5:30` in the environment works | **Partly**: `install.sh --tz` sets the files and exports TZ |
 
-## Amazon block (`tools/install.sh --amazon-block`)
-- Appends a marked block to `/etc/hosts` that maps the Amazon service hosts found in `/opt/amazon/ebook/config/*` and `/etc/sysconfig/ntp` to 127.0.0.1.
-  Source: `device/rootfs/etc/hosts.amazon-block`. The original file is saved as `/etc/hosts.k4-orig`, and `tools/uninstall.sh` removes the block.
-- Left alone on purpose: wifid's anonymous connectivity probe (S3/CloudFront, generic browser UA). wifid does its own DNS lookups and
-  injects the result into curl, so hosts entries wouldn't affect it anyway, and breaking the probe risks Wi-Fi drops.
-- Verified: the todo server gets connection refused. A Wi-Fi off/on cycle reconnected in about 16 s. After a reboot the UI and Wi-Fi were fine, and boot.sh synced the time from pool.ntp.org.
-- Not done: renaming `/etc/uks`. It would block OTA a second way, but also every `.bin` you install yourself.
+## Amazon
+Everything Amazon-related (what phones home, what `--amazon-block` and `--amazon-off` do, what stays) is in [amazon.md](amazon.md).

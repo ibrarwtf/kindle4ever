@@ -70,12 +70,15 @@ Optionally, reserve that IP for the Kindle's MAC in your router.
 
 ## 5. Install kindle4ever on the Kindle (risk: low; undo with `tools/uninstall.sh`)
 ```sh
-tools/install.sh --amazon-block --start
+tools/install.sh --amazon-block --amazon-off --no-browser --tz Asia/Kolkata --start
 ```
 - Copies the tools to `/mnt/us/kindle4ever/bin` and `boot.sh` to `/mnt/us/kindle4ever`.
 - Installs a small boot hook: `/etc/init.d/k4-boot`, which runs `boot.sh` at every boot.
   `boot.sh` keeps the Kindle from auto-sleeping (the power button still works) and syncs the clock.
-- `--amazon-block`: blocks Amazon's Kindle services in `/etc/hosts` (OTA, store, registration, telemetry, Amazon time). See [findings.md](findings.md).
+- `--amazon-block`: blocks Amazon's Kindle services in `/etc/hosts` (OTA, store, registration, telemetry, Amazon time).
+- `--amazon-off`: stops Amazon's phone-home and transfer daemons (they retry every 30-60 min and wake the device from sleep to do it)
+  and points the stock clock sync at `pool.ntp.org`. Everything Amazon-related is explained in [amazon.md](amazon.md).
+- `--no-browser`: stops the experimental web browser (about 21 MB of RAM). `--tz <zone>`: time zone (the stock system is UTC).
 - Kill switch: create `kindle4ever/DISABLE_BOOT` on the USB drive. Undo everything: `tools/uninstall.sh`.
 
 ## 6. Check it works (risk: none)

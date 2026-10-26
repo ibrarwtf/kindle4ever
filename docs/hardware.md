@@ -13,7 +13,7 @@ not forum lore. See [findings.md](findings.md) for claims we checked.
 | Kernel | `2.6.31-rt11-lab126` (2013 build), no IPv6 |
 | libc | glibc 2.12.1, so kindle4ever builds fully static musl binaries instead |
 | Userland | BusyBox **1.7.2** (no `grep -E`, no `od`, no `nohup`, `sed` treats `\r` as a literal `r`), OpenSSL 0.9.8j, curl 7.21.4 |
-| Init | SysV (`/etc/init.d`, `/etc/rc5.d`), no upstart. UI = Java "framework" (`cvm`), `/etc/init.d/framework stop|start` |
+| Init | SysV (`/etc/init.d`, `/etc/rc5.d`), no upstart. UI = Java "framework" (`cvm`, 52 MB RSS), `/etc/init.d/framework stop|start`; `/mnt/us/DONT_START_FRAMEWORK` holds it back at boot. Daemons are supervised by `pmond` (`lipc-set-prop com.lab126.pmond stop|start <name>`) |
 | USB | `1949:0004` mass storage. While the drive is mounted on a computer, `/mnt/us` is gone on the device **and Wi-Fi is off** |
 | Wi-Fi | `wifid` + `wpa_supplicant`. DNS via `/etc/resolv.conf` → `/var/run/resolv.conf`. `netwatchd` isn't running in rc5 |
 | Clock | Amazon NTP by default (`/usr/sbin/updatetime`, `ntp-g7g.amazon.com`). `ntpdate` is available |
@@ -47,10 +47,16 @@ not forum lore. See [findings.md](findings.md) for claims we checked.
 - `powerd` states: active → screenSaver (after `t1_timeout` = 600 s) → suspend.
   - `lipc-set-prop com.lab126.powerd touchScreenSaverTimeout 1` resets the idle timer (only works while active).
   - `preventScreenSaver 1` also blocks the power button.
-  - `powerd_test -p` simulates a power button press.
+  - `powerd_test -p` simulates a power button press. `-h` is a power-button *hold* (sleep with Wi-Fi off), not help.
 - Battery: `/sys/devices/system/yoshi_battery/yoshi_battery0/` (`battery_capacity`, `battery_mAH`, `battery_lmd`, ...) or `gasgauge-info -c`.
   A 13-year-old cell reported about 800 mAh full capacity.
-- RTCs: `rtc0` = mxc_rtc, `rtc1` = pmic_rtc. `/sys/devices/platform/mxc_rtc.0/wakeup_enable` exists (wake-from-suspend: untested). There's no `rtcwake`.
+- **Sleep and wake by RTC (tested 2026-10-26):** powerd owns the RTC alarm. Sequence after a power-button press (`powerd_test -p`):
+  screenSaver, after `t2_timeout` = 60 s `readyToSuspend` (Wi-Fi goes down here), after a grace of about 45 s `suspending`, then suspend.
+  `lipc-set-prop -i com.lab126.powerd rtcWakeup <seconds>` is accepted **only while in readyToSuspend** (`lipcPropErrInvalidState`
+  otherwise); set it from `lipc-wait-event com.lab126.powerd readyToSuspend`. powerd logs `rtcset:delay=N`, the device slept 198 s for
+  N = 180 and resumed into the screenSaver state with Wi-Fi reconnected within 3 s. **powerd never suspends while USB is charging.**
+  Test script: the kindle4ever repo's history has `rtc-test.sh`; the stock gas gauge resolves 1 mAh, so suspend current needs hours of sleep to measure.
+- RTCs: `rtc0` = mxc_rtc, `rtc1` = pmic_rtc. `/sys/devices/platform/mxc_rtc.0/wakeup_enable` is what powerd writes. There's no `rtcwake`.
 
 ## Firmware updates and Amazon
 - 4.1.4 is the final K4 firmware.

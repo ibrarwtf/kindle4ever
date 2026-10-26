@@ -1,0 +1,135 @@
+#!/bin/sh
+# Home screen: a small launcher that replaces Amazon's UI at boot (install.sh --home) and keeps a way back to it.
+#   k4home             take the screen (stops Amazon's UI if it is running) and run the menu until reboot
+#   k4home --draw [N]  draw once with item N (0-based) highlighted, no keys; for screenshots and tools/sim
+# Keys: 5-way or page keys move (partial refresh of the two cells only), Select opens (full flash on every
+# screen change, which is also what clears ghosting). Home redraws. Inside the Reader, hold the Keyboard key
+# for about 1.5 s to come back here (Amazon's UI gets the key too, so its keyboard may flash up first).
+# Status bar: time, cpu % and ram % used, Wi-Fi, battery.
+# Items: Reader (Amazon's stock UI, started with the time zone from install.sh --tz) and About (k4about).
+case "$1" in -h|--help) awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"; exit 0 ;; esac
+export PATH=/mnt/us/kindle4ever/bin:/usr/sbin:/sbin:/usr/bin:/bin
+# Run from a tmpfs copy: the shell reads scripts lazily, so updating this file (or the PC mounting /mnt/us) would break a running copy.
+case "$1" in --draw|-h|--help) ;; *) [ "$0" = /var/run/k4home ] || { cp "$0" /var/run/k4home && exec /bin/sh /var/run/k4home "$@"; } ;; esac
+case "$1" in --draw|-h|--help) ;; *) echo $$ > /var/run/k4home.pid ;; esac   # for restarts: kill $(cat /var/run/k4home.pid)
+F=/usr/java/lib/fonts
+REG=$F/Helvetica_LT_65_Medium.ttf
+BOLD=$F/Helvetica_LT_75_Bold.ttf
+ITEMS="reader about"
+N=2
+FIFO=/var/run/k4home.keys
+
+label() { case $1 in reader) echo "Reader" ;; about) echo "About" ;; esac; }
+
+# Status bar values (cheap, re-read on every draw).
+status() {
+  now=$(date '+%H:%M')
+  batt="$(gasgauge-info -c 2>/dev/null)"; batt=${batt:-"--%"}
+  [ "$(lipc-get-prop com.lab126.powerd isCharging 2>/dev/null)" = 1 ] && batt="$batt charging"
+  case "$(lipc-get-prop com.lab126.wifid cmState 2>/dev/null)" in
+    CONNECTED) wifi="wi-fi" ;; *) wifi="no wi-fi" ;;
+  esac
+  # CPU busy % over half a second (single core), and free memory incl. cache
+  read -r _ u1 n1 s1 i1 _ < /proc/stat 2>/dev/null; usleep 500000 2>/dev/null || sleep 1; read -r _ u2 n2 s2 i2 _ < /proc/stat 2>/dev/null
+  b=$(( (u2 - u1) + (n2 - n1) + (s2 - s1) )); t=$(( b + (i2 - i1) ))
+  [ "${t:-0}" -gt 0 ] 2>/dev/null && cpu="cpu $((b * 100 / t))%" || cpu=""
+  mem=$(awk '/^MemTotal/ {t=$2} /^MemFree/ {f=$2} /^Buffers/ {b=$2} /^Cached/ {c=$2} END {if (t) printf "ram %d%%", (t-f-b-c)*100/t}' /proc/meminfo 2>/dev/null)
+}
+
+# glyph NAME CX CY: an icon from rectangles, centred on (CX, CY).
+glyph() {
+  case $1 in
+    reader)   # an open book: two pages and a spine
+      echo "rect $(($2 - 58)) $(($3 - 42)) 56 84 0 3"
+      echo "rect $(($2 + 2)) $(($3 - 42)) 56 84 0 3"
+      echo "fill $(($2 - 2)) $(($3 - 46)) 4 92 0"
+      for gl in 0 1 2; do
+        gy=$(($3 - 22 + gl * 20))
+        echo "fill $(($2 - 46)) $gy 32 3 120"; echo "fill $(($2 + 14)) $gy 32 3 120"
+      done ;;
+    about)    # an "i" in a frame
+      echo "rect $(($2 - 44)) $(($3 - 44)) 88 88 0 3"
+      echo "font $BOLD"; echo "ctext $2 $(($3 - 40)) 72 0 i" ;;
+  esac
+}
+
+# Cells are 240x240 at y=150, x = 48 + I*264. Selected = thick border (THICK px), others = thin (THIN px); no fill.
+THIN=2; THICK=10
+cell_xy() { x=$((48 + $1 * 264)); y=150; w=240; h=240; cx=$((x + w / 2)); }
+# ring GRAY T: the four border strips of the current cell (x y w h), T px wide, in GRAY. Used for drawing and for refreshing.
+ring() {
+  echo "$3 $x $y $w $2 $1"; echo "$3 $x $((y + h - $2)) $w $2 $1"
+  echo "$3 $x $y $2 $h $1"; echo "$3 $((x + w - $2)) $y $2 $h $1"
+}
+# cell I SEL: one whole cell (item I), highlighted when I = SEL
+cell() {
+  it=$(item_at "$1"); cell_xy "$1"
+  if [ "$1" = "$2" ]; then echo "rect $x $y $w $h 0 $THICK"; else echo "rect $x $y $w $h 0 $THIN"; fi
+  glyph "$it" $cx $((y + 96))
+  echo "font $REG"; echo "ctext $cx $((y + h - 60)) 26 0 $(label "$it")"
+}
+# border I SEL: only the border strips of cell I (white under a thin ring, or a thick ring), and the matching partial refreshes
+border() {
+  cell_xy "$1"
+  if [ "$1" = "$2" ]; then ring 0 $THICK fill; else ring 255 $THICK fill; ring 0 $THIN fill; fi
+}
+border_refresh() { cell_xy "$1"; ring "" $THICK "refresh partial" | sed 's/ *$//'; }
+item_at() { i=0; for it in $ITEMS; do [ $i = "$1" ] && { echo "$it"; return; }; i=$((i + 1)); done; }
+
+# draw SEL: the whole screen, item SEL highlighted (caller decides the refresh: -F when entering the screen)
+draw() {
+  status
+  echo "clear"
+  echo "font $REG"
+  echo "text 32 14 22 0 $now"
+  [ -n "$cpu$mem" ] && echo "text 120 14 22 90 $cpu   $mem"
+  echo "ctext 455 14 22 0 $wifi"
+  echo "ctext 540 14 22 0 $batt"
+  echo "fill 32 46 536 2 0"
+  echo "font $BOLD"; echo "text 32 70 30 0 kindle4ever"
+  echo "font $REG";  echo "text 290 78 20 90 $N apps"
+  i=0
+  for it in $ITEMS; do cell $i "$1"; i=$((i + 1)); done
+}
+
+# move OLD NEW: redraw only the border strips of the two cells, then refresh exactly those strips (8 small partial updates, no flash)
+move() { { border "$1" "$2"; border "$2" "$2"; border_refresh "$1"; border_refresh "$2"; } | k4draw -n -; }
+
+if [ "$1" = "--draw" ]; then
+  draw "${2:-0}" | k4draw -F -
+  exit 0
+fi
+
+# Reader: start Amazon's UI with the zone name Java understands, wait for a long Keyboard press, take the screen back.
+run_reader() {
+  k4app off >/dev/null   # starts Amazon's UI with the Java zone name from install.sh --tz
+  rm -f $FIFO; mkfifo $FIFO
+  k4keys > $FIFO &
+  kp=$!
+  t0=
+  while read -r name ev _dev ms; do
+    case "$name $ev" in
+      "kbd down") t0=$ms ;;
+      "kbd up") [ -n "$t0" ] && [ $((ms - t0)) -ge 1200 ] && break; t0= ;;
+    esac
+  done < $FIFO
+  kill $kp 2>/dev/null; rm -f $FIFO
+  k4app on >/dev/null
+}
+
+[ "$(k4app status)" = "framework running" ] && k4app on >/dev/null
+sel=0
+draw $sel | k4draw -F -
+while key=$(k4keys -1); do
+  case $key in
+    left|up|lprev|rprev)      old=$sel; sel=$(( (sel + N - 1) % N )); move $old $sel ;;
+    right|down|lnext|rnext)   old=$sel; sel=$(( (sel + 1) % N ));     move $old $sel ;;
+    home|back|menu)           draw $sel | k4draw -F - ;;
+    select)
+      it=$(item_at $sel); case $it in
+        reader) run_reader ;;
+        about)  k4about ;;
+      esac
+      draw $sel | k4draw -F - ;;
+  esac
+done
