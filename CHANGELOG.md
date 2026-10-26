@@ -2,7 +2,7 @@
 
 User-facing notes per release. The release workflow publishes the section matching the tag.
 
-## v1.4.0 (unreleased)
+## v1.4.0
 
 - **Deep sleep by default.** `install.sh --sleep` sets powerd to screensaver after 3 min idle and suspend right after, the same
   path the power button takes. boot.sh no longer keeps the device awake unless `/mnt/us/kindle4ever/KEEP_AWAKE` exists.
