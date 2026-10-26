@@ -18,4 +18,11 @@ get() {  # get <name> <attachment id> <sha256> <unpack dir>
 get kindle-k4-jailbreak-1.8.N.zip 141180 e83da520a25b0186433f50d93e80af7245fbdf2bc2fb3593e25c2c01ddec9c52 jb
 # USBNetwork 0.57.N for K4 - https://www.mobileread.com/forums/showthread.php?t=88004
 get kindle-usbnetwork-0.57.N-k4.zip 141341 17e22860b623c39aba876078ddeb538d8b09f60b53554e98e9ea5d1ad1291e49 usbnet
+# DejaVu fonts (free, Bitstream Vera licence): DejaVu Sans Mono has the box-drawing glyphs the livestation app draws with
+if [ ! -f "$V/dejavu/dejavu-fonts-ttf-2.37/ttf/DejaVuSansMono.ttf" ]; then
+  echo "downloading DejaVu fonts"
+  mkdir -p "$V/dejavu"
+  curl -sSfL -o "$V/dejavu/dejavu.zip" "https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.zip"
+  (cd "$V/dejavu" && unzip -qo dejavu.zip && rm -f dejavu.zip)
+fi
 echo "vendor packages ready in $V"

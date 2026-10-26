@@ -54,6 +54,12 @@ The full walkthrough, with what to press on the Kindle at each step and a risk l
 | `k4press`, `k4wait` | Injects key presses, and waits until the screen settles. |
 | `k4welcome`, `k4about` | The welcome screen and the neofetch-style card above. |
 
+**Apps** (`apps/`, installed with `tools/k4 app apps/<name>`, shown on the `k4home` home screen):
+
+| App | Does |
+|---|---|
+| `livestation` | Indian Railways live platform board for your station, drawn as trains, fetched and rendered on the Kindle. [README](apps/livestation/README.md) |
+
 **On your computer** (`tools/`):
 
 | Tool | Does |

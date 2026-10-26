@@ -1,0 +1,1524 @@
+<html><body>
+tationInput"  type="text" class="form-control" placeholder="Station" id="jFromStationInput" onfocus="focustxt=this;"  value="MAS - PURATCHI THALAIVAR DR. MGR CTL CHENNAI" maxlength="25" autocomplete="off" style="min-width: 100px; max-width: 100%;">
+			    <span style="margin-left: -30px; z-index: 100;cursor: pointer;margin-top:7px;" onclick="document.getElementById('jFromStationInput').value='';"><i class="fa fa-times"></i></span> 
+			    
+			</div>
+		</div>
+
+         <div class="col-md">
+         <label for="jToStationInput">To Station<font color=red>*</font></label>
+         <div class="input-group">
+         <input name="jToStationInput"  type="text" class="form-control" id="jToStationInput" onfocus="focustxt=this;" placeholder="To Station (optional)" value="" maxlength="25" autocomplete="off" style="min-width: 100px; max-width: 100%;">
+         <span style="margin-left: -30px; z-index: 100;cursor: pointer;margin-top:7px;" onclick="document.getElementById('jToStationInput').value='';"><i class="fa fa-times"></i></span>
+         </div>
+         </div>
+ </div>
+ <br/>
+<div class="row" style="padding-left: 10px;padding-right: 10px;">
+<div class="col-md">
+<label for="nHr">Trains in Next<font color=red>*</font> &nbsp;</label><br>
+		<input type="radio" name="nHr" value="2" checked="checked" />&nbsp;<font size=3>2 Hours</font>
+		&nbsp;&nbsp;<input type="radio" name="nHr"  value="4" /> &nbsp;<font size=3>4 Hours</font>
+		&nbsp;&nbsp;<input type="radio" name="nHr"  value="8" /> &nbsp;<font size=3>8 Hours</font>
+</div>
+<div class="col-md">
+<div class="input-group" style="margin-top: 5px;">
+			&nbsp;<input type="button" class="custom-btn"  name="find" value="Get Trains" onclick="onLiveStationSubmit();">
+			&nbsp;<input type="button" class="custom-btn"  name="clear" value="Clear" onclick="clearLiveStnForm();">
+			</div>
+</div>
+</div>
+<div class="w3-panel" >
+<span id="divMessageText" style="color:red"></span>
+</div>
+
+<DIV ID="splashScreen" STYLE="position:absolute;visibility:hidden;z-index:5;top:47%;left:47%;">
+	<!--<span style="float:left;filter:alpha(opacity=75);-moz-opacity:.75;opacity:.75;">-->
+	<IMG SRC="images/350.gif" BORDER=0 width=40 height=40>
+	<!--</span>-->
+</DIV>
+<!-- Message Section -->
+
+
+<!-- Message Section -->
+
+
+
+
+<input class="form-control" type="text" id="myInput" onkeyup="myFunction()" placeholder="Train Search..">
+<table class="w3-bordered" id="myTable" style="width: 100%">
+<thead>
+<tr><th colspan="10" align="left"><font size="2" color="#006AD5" face="verdana">8 Trains departing from/arriving at <b>MAS - PURATCHI THALAIVAR DR. MGR CTL CHENNAI</b> in next 2 Hrs.</font>
+<!-- <br><font size="1" color="#006AD5" face="verdana">Click Train Number to See Train Running and Click Train Name for Schedule.</font>-->
+</th></tr>
+</thead>
+	<tbody>
+		<tr height="20">
+			<th style="text-align: right;">Sr.</th>
+			<th >Train No./Name </th>
+		    <th >Arrival	</th>
+			<th >Departure</th>
+			<th >Platform</th>
+		</tr>
+		<tr class="basic" style="display: none;"></tr>
+   
+		<tr><td nowrap style="width:20px;" style="text-align: right;">1</td>		    
+			<td align=left nowrap><b>22208</b>&nbsp;|
+			<b> MAS SF AC EXP</b><br>
+			<font size="2">(TVC-MAS)&nbsp;SUPERFAST<br/>1A,2A,3A</font><br>
+			<span class="w3-round w3-blue w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:onTrainStatus('22208',document.getElementsByName('frmSTN')[0],'25-Oct-2026')">See Train Status >></span>
+			&nbsp;
+			<span class="w3-round w3-orange w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:showTrainServiceSchedule('22208','25-Oct-2026',document.getElementsByName('frmSTN')[0])">Train Schedule >></span>
+			</td>
+			<td nowrap width="130px">
+		
+				
+				
+					<font color="red">10:55</font>
+				
+				<br>
+			
+				
+				<span class="w3-round w3-red w3-tiny w3-round" style="padding: 1px 4px;">30 Mins.</span>
+				<br>
+			<font size="1">&nbsp;10:25</font>
+		</td>
+			<td nowrap width="130px">
+						
+			<br>
+			
+			<br>
+			<font size="2">Destination</font>
+			</td>
+			<td  width="80px">
+			<b>1</b>
+			
+			<br><button type="button" class="w3-button w3-indigo w3-tiny w3-round" style="padding:1px 4px;" data-bs-toggle="modal" data-bs-target="#cpos22208">Coach Position </button>
+			
+			
+			</td>
+		</tr>
+	
+		<tr><td nowrap style="width:20px;" style="text-align: right;">2</td>		    
+			<td align=left nowrap><b>12028</b>&nbsp;|
+			<b> SHATABDI EXP</b><br>
+			<font size="2">(SBC-MAS)&nbsp;SHATABDI<br/>EC,CC,GEN,PWD</font><br>
+			<span class="w3-round w3-blue w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:onTrainStatus('12028',document.getElementsByName('frmSTN')[0],'26-Oct-2026')">See Train Status >></span>
+			&nbsp;
+			<span class="w3-round w3-orange w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:showTrainServiceSchedule('12028','26-Oct-2026',document.getElementsByName('frmSTN')[0])">Train Schedule >></span>
+			</td>
+			<td nowrap width="130px">
+		
+				
+				
+					<font color="green">11:00*</font>
+				
+				<br>
+			
+				
+				<span class="w3-round w3-green w3-tiny w3-round" style="padding: 1px 4px;">On Time</span>
+				<br>
+			<font size="1">&nbsp;11:00</font>
+		</td>
+			<td nowrap width="130px">
+						
+			<br>
+			
+			<br>
+			<font size="2">Destination</font>
+			</td>
+			<td  width="80px">
+			<b>2*</b>
+			
+			<br><button type="button" class="w3-button w3-indigo w3-tiny w3-round" style="padding:1px 4px;" data-bs-toggle="modal" data-bs-target="#cpos12028">Coach Position </button>
+			
+			
+			</td>
+		</tr>
+	
+		<tr><td nowrap style="width:20px;" style="text-align: right;">3</td>		    
+			<td align=left nowrap><b>12690</b>&nbsp;|
+			<b> CAPE MAS SF EXP</b><br>
+			<font size="2">(CAPE-MAS)&nbsp;SUPERFAST<br/>2A,3A,SL,GEN,PWD</font><br>
+			<span class="w3-round w3-blue w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:onTrainStatus('12690',document.getElementsByName('frmSTN')[0],'25-Oct-2026')">See Train Status >></span>
+			&nbsp;
+			<span class="w3-round w3-orange w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:showTrainServiceSchedule('12690','25-Oct-2026',document.getElementsByName('frmSTN')[0])">Train Schedule >></span>
+			</td>
+			<td nowrap width="130px">
+		
+				
+				
+					<font color="green">11:25*</font>
+				
+				<br>
+			
+				
+				<span class="w3-round w3-green w3-tiny w3-round" style="padding: 1px 4px;">On Time</span>
+				<br>
+			<font size="1">&nbsp;11:25</font>
+		</td>
+			<td nowrap width="130px">
+						
+			<br>
+			
+			<br>
+			<font size="2">Destination</font>
+			</td>
+			<td  width="80px">
+			<b>9*</b>
+			
+			<br><button type="button" class="w3-button w3-indigo w3-tiny w3-round" style="padding:1px 4px;" data-bs-toggle="modal" data-bs-target="#cpos12690">Coach Position </button>
+			
+			
+			</td>
+		</tr>
+	
+		<tr><td nowrap style="width:20px;" style="text-align: right;">4</td>		    
+			<td align=left nowrap><b>06122</b>&nbsp;|
+			<b> QLN MAS SPECIAL</b><br>
+			<font size="2">(QLN-MAS)&nbsp;TRAIN ON DEMAND</font><br>
+			<span class="w3-round w3-blue w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:onTrainStatus('06122',document.getElementsByName('frmSTN')[0],'25-Oct-2026')">See Train Status >></span>
+			&nbsp;
+			<span class="w3-round w3-orange w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:showTrainServiceSchedule('06122','25-Oct-2026',document.getElementsByName('frmSTN')[0])">Train Schedule >></span>
+			</td>
+			<td nowrap width="130px">
+		
+				
+				
+					<font color="green">11:35*</font>
+				
+				<br>
+			
+				
+				<span class="w3-round w3-green w3-tiny w3-round" style="padding: 1px 4px;">On Time</span>
+				<br>
+			<font size="1">&nbsp;11:35</font>
+		</td>
+			<td nowrap width="130px">
+						
+			<br>
+			
+			<br>
+			<font size="2">Destination</font>
+			</td>
+			<td  width="80px">
+			<b>7*</b>
+			
+			<br><button type="button" class="w3-button w3-indigo w3-tiny w3-round" style="padding:1px 4px;" data-bs-toggle="modal" data-bs-target="#cpos06122">Coach Position </button>
+			
+			
+			</td>
+		</tr>
+	
+		<tr><td nowrap style="width:20px;" style="text-align: right;">5</td>		    
+			<td align=left nowrap><b>20644</b>&nbsp;|
+			<b> MAS VANDEBHARAT</b><br>
+			<font size="2">(CBE-MAS)&nbsp;VANDE BHARAT<br/>EC,CC</font><br>
+			<span class="w3-round w3-blue w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:onTrainStatus('20644',document.getElementsByName('frmSTN')[0],'26-Oct-2026')">See Train Status >></span>
+			&nbsp;
+			<span class="w3-round w3-orange w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:showTrainServiceSchedule('20644','26-Oct-2026',document.getElementsByName('frmSTN')[0])">Train Schedule >></span>
+			</td>
+			<td nowrap width="130px">
+		
+				
+				
+					<font color="green">11:50*</font>
+				
+				<br>
+			
+				
+				<span class="w3-round w3-green w3-tiny w3-round" style="padding: 1px 4px;">On Time</span>
+				<br>
+			<font size="1">&nbsp;11:50</font>
+		</td>
+			<td nowrap width="130px">
+						
+			<br>
+			
+			<br>
+			<font size="2">Destination</font>
+			</td>
+			<td  width="80px">
+			<b>3*</b>
+			
+			<br><button type="button" class="w3-button w3-indigo w3-tiny w3-round" style="padding:1px 4px;" data-bs-toggle="modal" data-bs-target="#cpos20644">Coach Position </button>
+			
+			
+			</td>
+		</tr>
+	
+		<tr><td nowrap style="width:20px;" style="text-align: right;">6</td>		    
+			<td align=left nowrap><b>12608</b>&nbsp;|
+			<b> LALBAGH SF EXP</b><br>
+			<font size="2">(SBC-MAS)&nbsp;MAIL EXPRESS<br/>CC,2S,GEN,PWD</font><br>
+			<span class="w3-round w3-blue w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:onTrainStatus('12608',document.getElementsByName('frmSTN')[0],'26-Oct-2026')">See Train Status >></span>
+			&nbsp;
+			<span class="w3-round w3-orange w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:showTrainServiceSchedule('12608','26-Oct-2026',document.getElementsByName('frmSTN')[0])">Train Schedule >></span>
+			</td>
+			<td nowrap width="130px">
+		
+				
+				
+					<font color="green">12:20*</font>
+				
+				<br>
+			
+				
+				<span class="w3-round w3-green w3-tiny w3-round" style="padding: 1px 4px;">On Time</span>
+				<br>
+			<font size="1">&nbsp;12:20</font>
+		</td>
+			<td nowrap width="130px">
+						
+			<br>
+			
+			<br>
+			<font size="2">Destination</font>
+			</td>
+			<td  width="80px">
+			<b>8*</b>
+			
+			<br><button type="button" class="w3-button w3-indigo w3-tiny w3-round" style="padding:1px 4px;" data-bs-toggle="modal" data-bs-target="#cpos12608">Coach Position </button>
+			
+			
+			</td>
+		</tr>
+	
+		<tr><td nowrap style="width:20px;" style="text-align: right;">7</td>		    
+			<td align=left nowrap><b>20663</b>&nbsp;|
+			<b> MAS VANDE BHARAT</b><br>
+			<font size="2">(MYS-MAS)&nbsp;VANDE BHARAT<br/>EC,CC</font><br>
+			<span class="w3-round w3-blue w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:onTrainStatus('20663',document.getElementsByName('frmSTN')[0],'26-Oct-2026')">See Train Status >></span>
+			&nbsp;
+			<span class="w3-round w3-orange w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:showTrainServiceSchedule('20663','26-Oct-2026',document.getElementsByName('frmSTN')[0])">Train Schedule >></span>
+			</td>
+			<td nowrap width="130px">
+		
+				
+				
+					<font color="green">12:30*</font>
+				
+				<br>
+			
+				
+				<span class="w3-round w3-green w3-tiny w3-round" style="padding: 1px 4px;">On Time</span>
+				<br>
+			<font size="1">&nbsp;12:30</font>
+		</td>
+			<td nowrap width="130px">
+						
+			<br>
+			
+			<br>
+			<font size="2">Destination</font>
+			</td>
+			<td  width="80px">
+			<b>2A*</b>
+			
+			<br><button type="button" class="w3-button w3-indigo w3-tiny w3-round" style="padding:1px 4px;" data-bs-toggle="modal" data-bs-target="#cpos20663">Coach Position </button>
+			
+			
+			</td>
+		</tr>
+	
+		<tr><td nowrap style="width:20px;" style="text-align: right;">8</td>		    
+			<td align=left nowrap><b>22159</b>&nbsp;|
+			<b> CSMT CHENNAI EXP</b><br>
+			<font size="2">(CSMT-MAS)&nbsp;SUPERFAST<br/>2A,3E,SL,GEN,PWD</font><br>
+			<span class="w3-round w3-blue w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:onTrainStatus('22159',document.getElementsByName('frmSTN')[0],'25-Oct-2026')">See Train Status >></span>
+			&nbsp;
+			<span class="w3-round w3-orange w3-tiny w3-round" style="padding:1px 4px;font-size:8pt;cursor: pointer;" onclick="javascript:showTrainServiceSchedule('22159','25-Oct-2026',document.getElementsByName('frmSTN')[0])">Train Schedule >></span>
+			</td>
+			<td nowrap width="130px">
+		
+				
+				
+					<font color="red">12:45*</font>
+				
+				<br>
+			
+				
+				<span class="w3-round w3-red w3-tiny w3-round" style="padding: 1px 4px;">02:00 Hrs.</span>
+				<br>
+			<font size="1">&nbsp;10:45</font>
+		</td>
+			<td nowrap width="130px">
+						
+			<br>
+			
+			<br>
+			<font size="2">Destination</font>
+			</td>
+			<td  width="80px">
+			<b>11*</b>
+			
+			<br><button type="button" class="w3-button w3-indigo w3-tiny w3-round" style="padding:1px 4px;" data-bs-toggle="modal" data-bs-target="#cpos22159">Coach Position </button>
+			
+			
+			</td>
+		</tr>
+	
+</table>
+
+	   
+	   <div class="modal fade" id="cpos22208" tabindex="-1" role="dialog"  aria-labelledby="cpos22208" aria-hidden="true">
+		  <div class="modal-dialog modal-lg" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <div class="w3-panel w3-round w3-orange" ><h3>Coach Position  : 22208 | MAS  | 26-Oct | PF-1</h3></div>
+		        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background-color: transparent;border:none;">
+		          <span aria-hidden="true" style="font-size: 35px;">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      
+				<table >
+				<tr><td>	
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">ENG</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>ENG</b></div>
+						<div style="text-align: center;">0</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">LPR</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>LPR</b></div>
+						<div style="text-align: center;">1</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">1A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>H1</b></div>
+						<div style="text-align: center;">2</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>A1</b></div>
+						<div style="text-align: center;">3</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>A2</b></div>
+						<div style="text-align: center;">4</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B1</b></div>
+						<div style="text-align: center;">5</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B2</b></div>
+						<div style="text-align: center;">6</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B3</b></div>
+						<div style="text-align: center;">7</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">PC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>PC</b></div>
+						<div style="text-align: center;">8</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B4</b></div>
+						<div style="text-align: center;">9</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B5</b></div>
+						<div style="text-align: center;">10</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B6</b></div>
+						<div style="text-align: center;">11</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B7</b></div>
+						<div style="text-align: center;">12</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B8</b></div>
+						<div style="text-align: center;">13</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B9</b></div>
+						<div style="text-align: center;">14</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B10</b></div>
+						<div style="text-align: center;">15</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B11</b></div>
+						<div style="text-align: center;">16</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">LPR</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>LPR</b></div>
+						<div style="text-align: center;">17</div>
+					</div>
+					
+								
+							
+				</td></tr>
+				</table>
+				
+			</div>
+		      <div class="modal-footer">
+		      <div style="padding-right: 10px;">
+			Note - Data shown with (*) are dynamic in nature and may change. 
+			</div>
+		        <button type="button" class="custom-btn" data-bs-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div> 
+
+	   
+	   <div class="modal fade" id="cpos12028" tabindex="-1" role="dialog"  aria-labelledby="cpos12028" aria-hidden="true">
+		  <div class="modal-dialog modal-lg" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <div class="w3-panel w3-round w3-orange" ><h3>Coach Position  : 12028 | MAS  | 26-Oct | PF-2*</h3></div>
+		        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background-color: transparent;border:none;">
+		          <span aria-hidden="true" style="font-size: 35px;">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      
+				<table >
+				<tr><td>	
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">ENG</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>ENG</b></div>
+						<div style="text-align: center;">0</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">LPR</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>LPR</b></div>
+						<div style="text-align: center;">1</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">EC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>E1</b></div>
+						<div style="text-align: center;">2</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">EC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>E2</b></div>
+						<div style="text-align: center;">3</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C1</b></div>
+						<div style="text-align: center;">4</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C2</b></div>
+						<div style="text-align: center;">5</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C3</b></div>
+						<div style="text-align: center;">6</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C4</b></div>
+						<div style="text-align: center;">7</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C5</b></div>
+						<div style="text-align: center;">8</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C6</b></div>
+						<div style="text-align: center;">9</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C7</b></div>
+						<div style="text-align: center;">10</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C8</b></div>
+						<div style="text-align: center;">11</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C9</b></div>
+						<div style="text-align: center;">12</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C10</b></div>
+						<div style="text-align: center;">13</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C11</b></div>
+						<div style="text-align: center;">14</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C12</b></div>
+						<div style="text-align: center;">15</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C13</b></div>
+						<div style="text-align: center;">16</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3E</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>M14</b></div>
+						<div style="text-align: center;">17</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">LPR</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>LPR</b></div>
+						<div style="text-align: center;">18</div>
+					</div>
+					
+								
+							
+				</td></tr>
+				</table>
+				
+			</div>
+		      <div class="modal-footer">
+		      <div style="padding-right: 10px;">
+			Note - Data shown with (*) are dynamic in nature and may change. 
+			</div>
+		        <button type="button" class="custom-btn" data-bs-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div> 
+
+	   
+	   <div class="modal fade" id="cpos12690" tabindex="-1" role="dialog"  aria-labelledby="cpos12690" aria-hidden="true">
+		  <div class="modal-dialog modal-lg" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <div class="w3-panel w3-round w3-orange" ><h3>Coach Position  : 12690 | MAS  | 26-Oct | PF-9*</h3></div>
+		        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background-color: transparent;border:none;">
+		          <span aria-hidden="true" style="font-size: 35px;">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      
+				<table >
+				<tr><td>	
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">ENG</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>ENG</b></div>
+						<div style="text-align: center;">0</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SLRD</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>SLRD</b></div>
+						<div style="text-align: center;"><img style="margin-top: -7px;" alt="Divyangjan" src="images/div.png" height="12px;" width="12px;"/>&nbsp;1</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">2</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">3</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>A1</b></div>
+						<div style="text-align: center;">4</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>A2</b></div>
+						<div style="text-align: center;">5</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B1</b></div>
+						<div style="text-align: center;">6</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B2</b></div>
+						<div style="text-align: center;">7</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B3</b></div>
+						<div style="text-align: center;">8</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B4</b></div>
+						<div style="text-align: center;">9</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B5</b></div>
+						<div style="text-align: center;">10</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S1</b></div>
+						<div style="text-align: center;">11</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S2</b></div>
+						<div style="text-align: center;">12</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S3</b></div>
+						<div style="text-align: center;">13</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S4</b></div>
+						<div style="text-align: center;">14</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S5</b></div>
+						<div style="text-align: center;">15</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S6</b></div>
+						<div style="text-align: center;">16</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S7</b></div>
+						<div style="text-align: center;">17</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S8</b></div>
+						<div style="text-align: center;">18</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S9</b></div>
+						<div style="text-align: center;">19</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S10</b></div>
+						<div style="text-align: center;">20</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S11</b></div>
+						<div style="text-align: center;">21</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">22</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">23</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SLRD</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>SLRD</b></div>
+						<div style="text-align: center;"><img style="margin-top: -7px;" alt="Divyangjan" src="images/div.png" height="12px;" width="12px;"/>&nbsp;24</div>
+					</div>
+					
+									<br><img style="margin-top: -7px;" alt="Divyangjan" src="images/div.png" height="20px;" width="20px;"/>&nbsp;<font color="red">Divyangjan Coach at Position :  <b>1,24</b></font>
+							
+				</td></tr>
+				</table>
+				
+			</div>
+		      <div class="modal-footer">
+		      <div style="padding-right: 10px;">
+			Note - Data shown with (*) are dynamic in nature and may change. 
+			</div>
+		        <button type="button" class="custom-btn" data-bs-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div> 
+
+	   
+	   <div class="modal fade" id="cpos06122" tabindex="-1" role="dialog"  aria-labelledby="cpos06122" aria-hidden="true">
+		  <div class="modal-dialog modal-lg" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <div class="w3-panel w3-round w3-orange" ><h3>Coach Position  : 06122 | MAS  | 26-Oct | PF-7*</h3></div>
+		        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background-color: transparent;border:none;">
+		          <span aria-hidden="true" style="font-size: 35px;">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      
+				<table >
+				<tr><td>	
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">ENG</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>ENG</b></div>
+						<div style="text-align: center;">0</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SLRD</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>SLRD</b></div>
+						<div style="text-align: center;"><img style="margin-top: -7px;" alt="Divyangjan" src="images/div.png" height="12px;" width="12px;"/>&nbsp;1</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">1A+2A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>HA1</b></div>
+						<div style="text-align: center;">2</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>A1</b></div>
+						<div style="text-align: center;">3</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>A2</b></div>
+						<div style="text-align: center;">4</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B1</b></div>
+						<div style="text-align: center;">5</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B2</b></div>
+						<div style="text-align: center;">6</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B3</b></div>
+						<div style="text-align: center;">7</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>B4</b></div>
+						<div style="text-align: center;">8</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S1</b></div>
+						<div style="text-align: center;">9</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S2</b></div>
+						<div style="text-align: center;">10</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S3</b></div>
+						<div style="text-align: center;">11</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S4</b></div>
+						<div style="text-align: center;">12</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S5</b></div>
+						<div style="text-align: center;">13</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S6</b></div>
+						<div style="text-align: center;">14</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S7</b></div>
+						<div style="text-align: center;">15</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S8</b></div>
+						<div style="text-align: center;">16</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S9</b></div>
+						<div style="text-align: center;">17</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S10</b></div>
+						<div style="text-align: center;">18</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S11</b></div>
+						<div style="text-align: center;">19</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S12</b></div>
+						<div style="text-align: center;">20</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S13</b></div>
+						<div style="text-align: center;">21</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SLRD</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>SLRD</b></div>
+						<div style="text-align: center;"><img style="margin-top: -7px;" alt="Divyangjan" src="images/div.png" height="12px;" width="12px;"/>&nbsp;22</div>
+					</div>
+					
+									<br><img style="margin-top: -7px;" alt="Divyangjan" src="images/div.png" height="20px;" width="20px;"/>&nbsp;<font color="red">Divyangjan Coach at Position :  <b>1,22</b></font>
+							
+				</td></tr>
+				</table>
+				
+			</div>
+		      <div class="modal-footer">
+		      <div style="padding-right: 10px;">
+			Note - Data shown with (*) are dynamic in nature and may change. 
+			</div>
+		        <button type="button" class="custom-btn" data-bs-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div> 
+
+	   
+	   <div class="modal fade" id="cpos20644" tabindex="-1" role="dialog"  aria-labelledby="cpos20644" aria-hidden="true">
+		  <div class="modal-dialog modal-lg" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <div class="w3-panel w3-round w3-orange" ><h3>Coach Position  : 20644 | MAS  | 26-Oct | PF-3*</h3></div>
+		        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background-color: transparent;border:none;">
+		          <span aria-hidden="true" style="font-size: 35px;">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      
+				<table >
+				<tr><td>	
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C7</b></div>
+						<div style="text-align: center;">1</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C6</b></div>
+						<div style="text-align: center;">2</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">EC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>E1</b></div>
+						<div style="text-align: center;">3</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C5</b></div>
+						<div style="text-align: center;">4</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C4</b></div>
+						<div style="text-align: center;">5</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C3</b></div>
+						<div style="text-align: center;">6</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C2</b></div>
+						<div style="text-align: center;">7</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C1</b></div>
+						<div style="text-align: center;">8</div>
+					</div>
+					
+								
+							
+				</td></tr>
+				</table>
+				
+			</div>
+		      <div class="modal-footer">
+		      <div style="padding-right: 10px;">
+			Note - Data shown with (*) are dynamic in nature and may change. 
+			</div>
+		        <button type="button" class="custom-btn" data-bs-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div> 
+
+	   
+	   <div class="modal fade" id="cpos12608" tabindex="-1" role="dialog"  aria-labelledby="cpos12608" aria-hidden="true">
+		  <div class="modal-dialog modal-lg" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <div class="w3-panel w3-round w3-orange" ><h3>Coach Position  : 12608 | MAS  | 26-Oct | PF-8*</h3></div>
+		        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background-color: transparent;border:none;">
+		          <span aria-hidden="true" style="font-size: 35px;">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      
+				<table >
+				<tr><td>	
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">ENG</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>ENG</b></div>
+						<div style="text-align: center;">0</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SLRD</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>SLRD</b></div>
+						<div style="text-align: center;"><img style="margin-top: -7px;" alt="Divyangjan" src="images/div.png" height="12px;" width="12px;"/>&nbsp;1</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">2</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">3</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">4</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2S</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>D10</b></div>
+						<div style="text-align: center;">5</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2S</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>D9</b></div>
+						<div style="text-align: center;">6</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2S</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>D8</b></div>
+						<div style="text-align: center;">7</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2S</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>D7</b></div>
+						<div style="text-align: center;">8</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2S</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>D6</b></div>
+						<div style="text-align: center;">9</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2S</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>D5</b></div>
+						<div style="text-align: center;">10</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2S</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>D4</b></div>
+						<div style="text-align: center;">11</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2S</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>D3</b></div>
+						<div style="text-align: center;">12</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">PC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>PC</b></div>
+						<div style="text-align: center;">13</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2S</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>D2</b></div>
+						<div style="text-align: center;">14</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2S</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>D1</b></div>
+						<div style="text-align: center;">15</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C2</b></div>
+						<div style="text-align: center;">16</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C1</b></div>
+						<div style="text-align: center;">17</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">18</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">19</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">20</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">LPR</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>LPR</b></div>
+						<div style="text-align: center;">21</div>
+					</div>
+					
+									<br><img style="margin-top: -7px;" alt="Divyangjan" src="images/div.png" height="20px;" width="20px;"/>&nbsp;<font color="red">Divyangjan Coach at Position :  <b>1</b></font>
+							
+				</td></tr>
+				</table>
+				
+			</div>
+		      <div class="modal-footer">
+		      <div style="padding-right: 10px;">
+			Note - Data shown with (*) are dynamic in nature and may change. 
+			</div>
+		        <button type="button" class="custom-btn" data-bs-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div> 
+
+	   
+	   <div class="modal fade" id="cpos20663" tabindex="-1" role="dialog"  aria-labelledby="cpos20663" aria-hidden="true">
+		  <div class="modal-dialog modal-lg" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <div class="w3-panel w3-round w3-orange" ><h3>Coach Position  : 20663 | MAS  | 26-Oct | PF-2A*</h3></div>
+		        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background-color: transparent;border:none;">
+		          <span aria-hidden="true" style="font-size: 35px;">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      
+				<table >
+				<tr><td>	
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C1</b></div>
+						<div style="text-align: center;">1</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C2</b></div>
+						<div style="text-align: center;">2</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>CE1</b></div>
+						<div style="text-align: center;">3</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C3</b></div>
+						<div style="text-align: center;">4</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C4</b></div>
+						<div style="text-align: center;">5</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C5</b></div>
+						<div style="text-align: center;">6</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C6</b></div>
+						<div style="text-align: center;">7</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">CC</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>C7</b></div>
+						<div style="text-align: center;">8</div>
+					</div>
+					
+								
+							
+				</td></tr>
+				</table>
+				
+			</div>
+		      <div class="modal-footer">
+		      <div style="padding-right: 10px;">
+			Note - Data shown with (*) are dynamic in nature and may change. 
+			</div>
+		        <button type="button" class="custom-btn" data-bs-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div> 
+
+	   
+	   <div class="modal fade" id="cpos22159" tabindex="-1" role="dialog"  aria-labelledby="cpos22159" aria-hidden="true">
+		  <div class="modal-dialog modal-lg" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <div class="w3-panel w3-round w3-orange" ><h3>Coach Position  : 22159 | MAS  | 26-Oct | PF-11*</h3></div>
+		        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background-color: transparent;border:none;">
+		          <span aria-hidden="true" style="font-size: 35px;">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      
+				<table >
+				<tr><td>	
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">ENG</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>ENG</b></div>
+						<div style="text-align: center;">0</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">LPR</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>LPR</b></div>
+						<div style="text-align: center;">1</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">2</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">3</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S2</b></div>
+						<div style="text-align: center;">4</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SL</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>S1</b></div>
+						<div style="text-align: center;">5</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3E</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>M6</b></div>
+						<div style="text-align: center;">6</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3E</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>M5</b></div>
+						<div style="text-align: center;">7</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3E</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>M4</b></div>
+						<div style="text-align: center;">8</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3E</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>M3</b></div>
+						<div style="text-align: center;">9</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3E</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>M2</b></div>
+						<div style="text-align: center;">10</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">3E</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>M1</b></div>
+						<div style="text-align: center;">11</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>A2</b></div>
+						<div style="text-align: center;">12</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">2A</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>A1</b></div>
+						<div style="text-align: center;">13</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">14</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">GEN</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>GEN</b></div>
+						<div style="text-align: center;">15</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">SLRD</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>SLRD</b></div>
+						<div style="text-align: center;"><img style="margin-top: -7px;" alt="Divyangjan" src="images/div.png" height="12px;" width="12px;"/>&nbsp;16</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">OCV</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>OCV</b></div>
+						<div style="text-align: center;">17</div>
+					</div>
+					    
+					<div style="width:45px;height:60px;text-align:center;padding:2px;font-family:verdana;font-size:10px;display:inline-block;">
+						<div style="text-align: center;">OCV</div>
+						<div style="width: 40px;height:18px;border:1px solid #BEBEBE;border-radius:5px;font-size:11px;"><b>OCV</b></div>
+						<div style="text-align: center;">18</div>
+					</div>
+					
+									<br><img style="margin-top: -7px;" alt="Divyangjan" src="images/div.png" height="20px;" width="20px;"/>&nbsp;<font color="red">Divyangjan Coach at Position :  <b>16</b></font>
+							
+				</td></tr>
+				</table>
+				
+			</div>
+		      <div class="modal-footer">
+		      <div style="padding-right: 10px;">
+			Note - Data shown with (*) are dynamic in nature and may change. 
+			</div>
+		        <button type="button" class="custom-btn" data-bs-dismiss="modal">Close</button>
+		      </div>
+		    </div>
+		  </div>
+		</div> 
+
+<table style="display: none;"></table>
+<div style="padding: 10px;">
+Note - Data shown with (*) are dynamic in nature and may change. 
+</div>
+<br>
+
+<!--  
+
+-->
+
+
+<!-- /37179215/MNTES_LIVE_STATION_TOP -->
+<div id='div-gpt-ad-1614770073541-0' style="text-align: center;">
+
+</div>
+
+<!-- /37179215/MNTES_LIVE_STATION_BOTTOM -->
+<div id='div-gpt-ad-1614770217808-0' style="text-align: center;">
+
+</div>
+
+
+
+
+<!-- Footer -->
+
+
+
+
+<center>
+<table style="width: 100%;text-align: right;">
+	<tr>
+		<td align="right"><font size="2" color="#006fc4" face="verdana">26-Oct 11:03&nbsp;</font>
+			<a href="https://www.facebook.com/RailMinIndia" target="_blank"><img src="images/facebook_icon.png" border=0 width="24" height="24"></a>
+			<a href="https://twitter.com/RailMinIndia" target="_blank"><img src="images/twitter_icon.png" border=0 width="24" height="24"></a>
+			<a href="https://www.youtube.com/user/RailMinIndia" target="_blank"><img src="images/youtube.png" border=0 width="24" height="24"></a>
+		</td>
+	</tr>
+	
+</table>
+<br/>
+<table style="border-radius: 20px;font-size: 13px;">
+<tr><td align="center" colspan="2" style="padding-top: 5px;"><img src="images/ROne.png" height="65" width="65" style="margin-bottom: 5px;"><br/><img src="images/new_blink.gif" width="50px" height="30px" style="margin-top:-10px;"/><b>RailOne - Official Indian Railways Super App!</b><img src="images/new_blink.gif" width="50px" height="30px" style="margin-top:-10px;"/></td></tr>
+<tr><td colspan="2" style="padding-left: 10px;padding-right: 10px;">
+Book tickets, check train status, track PNR & order food - All in one secure app.</td></tr>
+<tr><td align="right" style="padding-right: 10px;padding-bottom: 10px;"><img alt="Android" src="images/Google_Play_logo.png" height="25" width="24" style="margin-top:-5px;"> <a onclick="showRA();" href="#" style="color: #7726A6"><b>Download Android App</b></a></td><td style="padding-left: 10px;padding-bottom: 10px;"><img alt="iOS" src="images/apple.png" height="26" width="26" style="margin-top:-8px;padding:3px;background: #121212;border-radius: 5px;"> <a onclick="showRI();" href="#" style="color: #7726A6;"><b>Download iOS App</b></a></td>
+</table>
+<br/>
+<a href="https://www.india.gov.in" target="_blank"><img src="images/india_gov_in.png" height="75" width="100"></a>
+<input type="hidden" name="appLang" value="en">
+<font size="1"	color="#e98e05" face="verdana" >	
+<br>Property of Indian Railways
+<br>Designed, Developed and Hosted by CRIS
+<br>Copyright &copy; 2013 Centre for Railway Information Systems
+<br>All Rights Reserved
+</font>
+<br>
+</center>
+
+<div id="ra" class="w3-modal" style="cursor:pointer;display:none;">
+  <div class="w3-modal-content w3-card-
+</body></html>

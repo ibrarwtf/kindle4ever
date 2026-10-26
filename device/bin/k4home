@@ -6,7 +6,10 @@
 # screen change, which is also what clears ghosting). Home redraws. Inside the Reader, hold the Keyboard key
 # for about 1.5 s to come back here (Amazon's UI gets the key too, so its keyboard may flash up first).
 # Status bar: time, cpu % and ram % used, Wi-Fi, battery.
-# Items: Reader (Amazon's stock UI, started with the time zone from install.sh --tz) and About (k4about).
+# Items: Reader (Amazon's stock UI, started with the time zone from install.sh --tz), About (k4about), and one cell per app
+# found in /mnt/us/kindle4ever/apps/<name>/app.sh. An app is a script with a "# name: Label" line; it is run with the
+# screen already ours (framework stopped) and keys free, and it returns when the user presses Back or Home.
+# An optional icon.sh next to it prints k4draw commands for its icon, centred on the CX CY it is given.
 case "$1" in -h|--help) awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "$0"; exit 0 ;; esac
 export PATH=/mnt/us/kindle4ever/bin:/usr/sbin:/sbin:/usr/bin:/bin
 # Run from a tmpfs copy: the shell reads scripts lazily, so updating this file (or the PC mounting /mnt/us) would break a running copy.
@@ -15,11 +18,18 @@ case "$1" in --draw|-h|--help) ;; *) echo $$ > /var/run/k4home.pid ;; esac   # f
 F=/usr/java/lib/fonts
 REG=$F/Helvetica_LT_65_Medium.ttf
 BOLD=$F/Helvetica_LT_75_Bold.ttf
+APPS=/mnt/us/kindle4ever/apps
 ITEMS="reader about"
-N=2
+for d in $APPS/*/; do [ -x "$d/app.sh" ] && ITEMS="$ITEMS app:$(basename "$d")"; done
+N=$(set -- $ITEMS; echo $#)
 FIFO=/var/run/k4home.keys
 
-label() { case $1 in reader) echo "Reader" ;; about) echo "About" ;; esac; }
+label() {
+  case $1 in
+    reader) echo "Reader" ;; about) echo "About" ;;
+    app:*) n=${1#app:}; l=$(sed -n 's/^# name: *//p' "$APPS/$n/app.sh" | head -1); echo "${l:-$n}" ;;
+  esac
+}
 
 # Status bar values (cheap, re-read on every draw).
 status() {
@@ -50,12 +60,20 @@ glyph() {
     about)    # an "i" in a frame
       echo "rect $(($2 - 44)) $(($3 - 44)) 88 88 0 3"
       echo "font $BOLD"; echo "ctext $2 $(($3 - 40)) 72 0 i" ;;
+    app:*)    # the app's own icon.sh (k4draw commands centred on CX CY), else the first letter of its label in a frame
+      n=${1#app:}
+      if [ -x "$APPS/$n/icon.sh" ]; then /bin/sh "$APPS/$n/icon.sh" "$2" "$3"
+      else
+        l=$(label "$1"); c=$(printf '%s' "$l" | cut -c1 | tr 'a-z' 'A-Z')
+        echo "rect $(($2 - 44)) $(($3 - 44)) 88 88 0 3"
+        echo "font $BOLD"; echo "ctext $2 $(($3 - 40)) 72 0 $c"
+      fi ;;
   esac
 }
 
 # Cells are 240x240 at y=150, x = 48 + I*264. Selected = thick border (THICK px), others = thin (THIN px); no fill.
 THIN=2; THICK=10
-cell_xy() { x=$((48 + $1 * 264)); y=150; w=240; h=240; cx=$((x + w / 2)); }
+cell_xy() { x=$((48 + ($1 % 2) * 264)); y=$((150 + ($1 / 2) * 264)); w=240; h=240; cx=$((x + w / 2)); }
 # ring GRAY T: the four border strips of the current cell (x y w h), T px wide, in GRAY. Used for drawing and for refreshing.
 ring() {
   echo "$3 $x $y $w $2 $1"; echo "$3 $x $((y + h - $2)) $w $2 $1"
@@ -129,6 +147,7 @@ while key=$(k4keys -1); do
       it=$(item_at $sel); case $it in
         reader) run_reader ;;
         about)  k4about ;;
+        app:*)  /bin/sh "$APPS/${it#app:}/app.sh" >> /var/log/k4-home.log 2>&1 ;;
       esac
       draw $sel | k4draw -F - ;;
   esac

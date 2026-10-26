@@ -2,6 +2,20 @@
 
 User-facing notes per release. The release workflow publishes the section matching the tag.
 
+## v1.2.0
+
+- **k4draw landscape mode**: `K4DRAW_ROTATE=90` (device turned anticlockwise, keypad on the right) or `270`. Commands, the
+  dirty-rectangle refresh and `export` all work in 800x600 landscape coordinates; k4draw rotates into the portrait framebuffer.
+- **Apps on the home screen**: `k4home` lists every `/mnt/us/kindle4ever/apps/<name>/app.sh` (label from its `# name:` line)
+  as a cell after Reader and About, wrapping two per row. An app runs with the screen already taken and returns on Back/Home.
+- **`apps/livestation`**: the first app. An Indian Railways live platform board for one station (NTES), drawn as trains,
+  fully on the device: `k4fetch` + three busybox awk programs + `k4draw` landscape. About 1.2 s CPU and under 1.5 MB per refresh.
+  Configured by one small `station.conf` (your station, its neighbours); `tools/k4 app apps/livestation` installs it.
+- Apps can ship an `icon.sh` that prints k4draw commands for their home-screen icon; `tools/fetch-vendor.sh` now also fetches
+  the DejaVu fonts (DejaVu Sans Mono has the box-drawing glyphs the board uses).
+- Apps carry their own `# version:` line (livestation 0.1.0); the kindle4ever tag versions the bundle that ships them.
+- Private apps and configs stay out of this repo; only the folder convention is public.
+
 ## v1.1.0
 
 - **`install.sh --amazon-off`**: stops and disables Amazon's phone-home (`phd`) and transfer (`tmd`) daemons. `phd` retried Amazon

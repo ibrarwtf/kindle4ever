@@ -1,0 +1,15 @@
+# Live station app: copy to station.conf and fill in your station. Shell syntax (sourced by app.sh).
+# Station code and name exactly as NTES writes them ("CODE - NAME" in its station field).
+CODE=SC
+NAME="SECUNDERABAD JN"
+# What is to the LEFT and RIGHT of the board, as the Kindle lies in landscape with the keypad on the right.
+# Trains move toward the side of their destination.
+LEFT="HYDERABAD / KACHEGUDA"
+RIGHT="KAZIPET / NAGPUR"
+# Destination (and origin) station codes that lie on the RIGHT side. Everything else is drawn moving left.
+RIGHT_SIDE="KZJ WL BPQ NGP NDLS NZM BZA MAS HWH"
+# Platforms shown as train drawings (up to 3 fit). Other platforms only appear in "coming up".
+PLATFORMS="1 2 3"
+# NTES look-ahead window in hours (2, 4 or 8) and refresh interval in seconds.
+HOURS=8
+REFRESH=300

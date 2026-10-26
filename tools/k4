@@ -7,6 +7,8 @@
 #   k4 pushbin <local> <remote>  copy a binary file as-is
 #   k4 run <script> [args]       copy a script to the Kindle and run it
 #   k4 deploy                    copy device/bin + build/ binaries to the Kindle (install.sh does the full setup)
+#   k4 app <dir>                 install a home-screen app folder to /mnt/us/kindle4ever/apps/<name> (adds the DejaVu
+#                                Sans Mono font from vendor/ when present; tools/fetch-vendor.sh downloads it)
 #   k4 doctor [--markdown]       self-test (tools/doctor.sh)
 #   k4 sim <k4draw args>         simulated screen on this computer (tools/sim)
 #   k4 version                   kindle4ever version on this computer and on the Kindle
@@ -46,6 +48,13 @@ case "$cmd" in
   pushbin) quiet k4_ssh "mkdir -p \"\$(dirname '$2')\" && cat > '$2'" < "$1" ;;
   run) f=$1; shift; r=$D/run/$(basename "$f")
        tr -d '\r' < "$f" | quiet k4_ssh "mkdir -p $D/run && cat > $r && chmod +x $r" && quiet k4_ssh "$K4_REMOTE_ENV $r $*" ;;
+  app) a=${1%/}; [ -f "$a/app.sh" ] || { echo "k4 app: $a has no app.sh" >&2; exit 2; }; n=$(basename "$a")
+       me=$K4_ROOT/tools/k4   # not $0: we cd'd to K4_ROOT above, so a relative $0 would break
+       for f in "$a"/*; do case "$f" in *.conf) ;; *.ttf|*.png|*.jpg|*.pgm) sh "$me" pushbin "$f" "$D/apps/$n/$(basename "$f")" ;; *) sh "$me" push "$f" "$D/apps/$n/$(basename "$f")" ;; esac; done
+       mono="$K4_VENDOR/dejavu/dejavu-fonts-ttf-2.37/ttf/DejaVuSansMono.ttf"
+       [ -f "$mono" ] && [ ! -f "$a/DejaVuSansMono.ttf" ] && sh "$me" pushbin "$mono" "$D/apps/$n/DejaVuSansMono.ttf"
+       quiet k4_ssh "chmod +x $D/apps/$n/*.sh; ls $D/apps/$n"
+       echo "installed $n $(sed -n 's/^# version: *//p' "$a/app.sh" | head -1)" ;;
   deploy) for f in device/bin/*; do sh "$0" push "$f" "$D/bin/$(basename "$f")"; done
           for f in build/*; do [ -f "$f" ] && sh "$0" pushbin "$f" "$D/bin/$(basename "$f")"; done
           quiet k4_ssh "chmod +x $D/bin/*; ls $D/bin" ;;
@@ -53,5 +62,5 @@ case "$cmd" in
   sim) exec tools/sim "$@" ;;
   version) echo "host:   $(k4_version)"
            printf 'device: '; quiet k4_ssh "cat $D/VERSION 2>/dev/null || echo 'not installed'" ;;
-  *) sed -n '2,14p' "$0"; exit 2 ;;
+  *) sed -n '2,16p' "$0"; exit 2 ;;
 esac

@@ -33,6 +33,8 @@ Without -n, each command refreshes what it drew; in stdin mode one refresh cover
 Environment:
   K4DRAW_FB=FILE    simulate: draw into FILE (raw 600x800 screen, created white) instead of /dev/fb0.
                    Works on any computer; use export to look at it.
+  K4DRAW_ROTATE=90  landscape: the screen is 800x600, drawn rotated for a device turned anticlockwise
+                   (keypad on the right); 270 = turned clockwise. All commands and export use landscape coordinates.
   K4DRAW_FONT=PATH  default font (device: /usr/java/lib/fonts/Helvetica_LT_65_Medium.ttf;
                    sim: a system sans font if found)
   K4DRAW_DEBUG=1    print refresh timings to stderr
@@ -124,7 +126,10 @@ Keys: 5-way or page keys move (partial refresh of the two cells only), Select op
 screen change, which is also what clears ghosting). Home redraws. Inside the Reader, hold the Keyboard key
 for about 1.5 s to come back here (Amazon's UI gets the key too, so its keyboard may flash up first).
 Status bar: time, cpu % and ram % used, Wi-Fi, battery.
-Items: Reader (Amazon's stock UI, started with the time zone from install.sh --tz) and About (k4about).
+Items: Reader (Amazon's stock UI, started with the time zone from install.sh --tz), About (k4about), and one cell per app
+found in /mnt/us/kindle4ever/apps/<name>/app.sh. An app is a script with a "# name: Label" line; it is run with the
+screen already ours (framework stopped) and keys free, and it returns when the user presses Back or Home.
+An optional icon.sh next to it prints k4draw commands for its icon, centred on the CX CY it is given.
 ```
 
 ## k4about

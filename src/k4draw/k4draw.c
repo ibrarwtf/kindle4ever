@@ -79,6 +79,8 @@ static const char USAGE[] =
 "Environment:\n"
 "  K4DRAW_FB=FILE    simulate: draw into FILE (raw 600x800 screen, created white) instead of /dev/fb0.\n"
 "                   Works on any computer; use export to look at it.\n"
+"  K4DRAW_ROTATE=90  landscape: the screen is 800x600, drawn rotated for a device turned anticlockwise\n"
+"                   (keypad on the right); 270 = turned clockwise. All commands and export use landscape coordinates.\n"
 "  K4DRAW_FONT=PATH  default font (device: /usr/java/lib/fonts/Helvetica_LT_65_Medium.ttf;\n"
 "                   sim: a system sans font if found)\n"
 "  K4DRAW_DEBUG=1    print refresh timings to stderr\n"
@@ -92,6 +94,11 @@ static const char *sim_path;  // K4DRAW_FB: simulated screen file
 static uint8_t *fb;
 static int W, H, stride;
 static size_t fb_len;
+// Landscape (K4DRAW_ROTATE=90 or 270): commands draw into a logical W x H canvas (800x600) and refresh() copies it,
+// rotated, into the physical portrait framebuffer. 90 = device turned anticlockwise (keypad on the right), 270 = clockwise.
+static int rot;
+static uint8_t *phys;          // the real framebuffer (or sim file buffer) while fb points at the canvas
+static int PW, PH, pstride;
 static int opt_norefresh, opt_flash;
 static const char *font_path;  // NULL until first use: default_font()
 static unsigned char *font_data;
@@ -99,6 +106,8 @@ static stbtt_fontinfo font;
 
 // Dirty rectangle accumulated over all drawing (x1,y1 inclusive; x2,y2 exclusive).
 static int dx1 = 1 << 30, dy1 = 1 << 30, dx2 = -1, dy2 = -1;
+
+static int clampi(int v, int lo, int hi);
 
 static void die(const char *fmt, const char *arg) {
     fprintf(stderr, "k4draw: ");
@@ -157,7 +166,35 @@ static void fb_open(void) {
 #endif
 }
 
+// Logical (x,y) -> physical byte offset in the portrait framebuffer.
+static inline size_t phys_at(int x, int y) {
+    return rot == 90 ? (size_t)x * pstride + (PW - 1 - y) : (size_t)(PH - 1 - x) * pstride + y;
+}
+
+static void rotate_open(void) {
+    const char *r = getenv("K4DRAW_ROTATE");
+    if (!r || !*r || !strcmp(r, "0")) return;
+    rot = atoi(r);
+    if (rot != 90 && rot != 270) die("K4DRAW_ROTATE must be 0, 90 or 270 (got %s)", r);
+    phys = fb, PW = W, PH = H, pstride = stride;
+    W = PH, H = PW, stride = W;
+    fb = malloc((size_t)stride * H);
+    if (!fb) die("out of memory%s", "");
+    for (int y = 0; y < H; y++)             // start from what is on the panel, so partial draws compose
+        for (int x = 0; x < W; x++) fb[y * stride + x] = phys[phys_at(x, y)];
+}
+
+// Copy the logical region to the physical framebuffer (whole canvas when w or h <= 0).
+static void rotate_sync(int x, int y, int w, int h) {
+    if (!rot) return;
+    int x0 = 0, y0 = 0, x1 = W, y1 = H;
+    if (w > 0 && h > 0) x0 = clampi(x, 0, W), y0 = clampi(y, 0, H), x1 = clampi(x + w, 0, W), y1 = clampi(y + h, 0, H);
+    for (int yy = y0; yy < y1; yy++)
+        for (int xx = x0; xx < x1; xx++) phys[phys_at(xx, yy)] = fb[yy * stride + xx];
+}
+
 static void fb_close(void) {
+    if (rot) { rotate_sync(0, 0, 0, 0); free(fb); fb = phys; }
     if (sim_path) { sim_save(); free(fb); return; }
 #ifdef __linux__
     munmap(fb, fb_len);
@@ -206,6 +243,7 @@ static void mark(int x, int y, int w, int h) {
 }
 
 static int clampi(int v, int lo, int hi) { return v < lo ? lo : v > hi ? hi : v; }
+// (clampi is declared above fb_close for rotate_sync)
 
 // gray: 0 = black, 255 = white (normal). Memory is inverted.
 static inline void put(int x, int y, int gray) {
@@ -315,14 +353,19 @@ static void image(const char *path, int x, int y) {
 
 // Refresh the panel. x,y,w,h < 0 / 0 means whole screen.
 static int refresh(int fx, int x, int y, int w, int h) {
+    int whole = w <= 0 || h <= 0 || (x <= 0 && y <= 0 && x + w >= W && y + h >= H);
+    rotate_sync(x, y, whole ? 0 : w, whole ? 0 : h);
     if (sim_path) return 0;  // simulated screen: nothing to refresh
     double t0 = now_ms();
     int r = -1;
 #ifdef __linux__
-    if (w <= 0 || h <= 0 || (x <= 0 && y <= 0 && x + w >= W && y + h >= H)) {
+    if (whole) {
         r = ioctl(fb_fd, FBIO_EINK_UPDATE_DISPLAY, fx);
     } else {
-        struct update_area a = { clampi(x, 0, W), clampi(y, 0, H), clampi(x + w, 0, W), clampi(y + h, 0, H), fx, NULL };
+        int x0 = clampi(x, 0, W), y0 = clampi(y, 0, H), x1 = clampi(x + w, 0, W), y1 = clampi(y + h, 0, H);
+        if (rot == 90) { int t0_ = x0, t1_ = x1; x0 = PW - y1; x1 = PW - y0; y0 = t0_; y1 = t1_; }
+        else if (rot == 270) { int t0_ = x0, t1_ = x1; x0 = y0; x1 = y1; y0 = PH - t1_; y1 = PH - t0_; }
+        struct update_area a = { x0, y0, x1, y1, fx, NULL };
         r = ioctl(fb_fd, FBIO_EINK_UPDATE_DISPLAY_AREA, &a);
     }
 #else
@@ -347,8 +390,8 @@ static int parse_fx(const char *s) {
 static int run(int argc, char **argv) {
     const char *cmd = argv[0];
     if (!strcmp(cmd, "info")) {
-        printf("%dx%d stride=%d mem=%zu mode=%s font=%s\n", W, H, stride, fb_len, sim_path ? "sim" : "device",
-               font_path ? font_path : default_font());
+        printf("%dx%d stride=%d mem=%zu mode=%s rotate=%d font=%s\n", W, H, stride, fb_len, sim_path ? "sim" : "device",
+               rot, font_path ? font_path : default_font());
         return 1;
     } else if (!strcmp(cmd, "clear")) {
         int g = argc > 1 ? atoi(argv[1]) : 255;
@@ -442,6 +485,7 @@ int main(int argc, char **argv) {
         return 2;
     }
     fb_open();
+    rotate_open();
     if (!strcmp(argv[i], "-")) {
         char line[2048], *av[16];
         while (fgets(line, sizeof line, stdin)) {

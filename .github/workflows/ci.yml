@@ -19,7 +19,16 @@ jobs:
       - name: ShellCheck (POSIX sh, warnings and errors)
         run: |
           shellcheck -s sh -S warning tools/*.sh tools/k4 tools/kcc tools/sim tools/lib/*.sh \
-            device/bin/* device/kindle4ever/boot.sh device/rootfs/etc/init.d/k4-boot device/jailbreak/runme.sh examples/*.sh
+            device/bin/* device/kindle4ever/boot.sh device/rootfs/etc/init.d/k4-boot device/jailbreak/runme.sh examples/*.sh             apps/*/*.sh
+
+      - name: Apps (awk pipelines against their fixtures, with busybox awk like the device)
+        run: |
+          sudo apt-get install -y -qq busybox >/dev/null
+          cd apps/livestation
+          busybox awk -f ntes.awk test/sample-mas.html | diff - test/expected-rows.txt
+          busybox awk -v now=10:30 -v date="MON 26 OCT" -v code=MAS -v name="MGR CHENNAI CENTRAL" -v llabel="ARAKKONAM / BENGALURU" -v rlabel="GUDUR / VIJAYAWADA" -v rightside="GDR BZA VSKP HWH NDLS SC HYB" -v platforms="1 2 3" -f board.awk test/expected-rows.txt > /tmp/board.txt
+          test "$(wc -l < /tmp/board.txt)" -eq 23
+          busybox awk -v mono=x -v title="MGR CHENNAI CENTRAL STATION" -v left="ARAKKONAM / BENGALURU" -v right="GUDUR / VIJAYAWADA" -f render.awk /tmp/board.txt | grep -c '^fill ' | xargs test 100 -lt
 
       - name: Leak check (generic patterns)
         run: tools/check-public.sh
